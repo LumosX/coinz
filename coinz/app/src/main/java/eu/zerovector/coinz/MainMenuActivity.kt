@@ -1,5 +1,6 @@
 package eu.zerovector.coinz
 
+import android.content.Intent
 import android.os.Bundle
 import android.os.Handler
 import android.support.v7.app.AppCompatActivity
@@ -28,23 +29,6 @@ class MainMenuActivity : AppCompatActivity() {
 
     }
 
-    override fun onPostCreate(savedInstanceState: Bundle?) {
-        super.onPostCreate(savedInstanceState)
-
-        // Trigger the initial hide() shortly after the activity has been
-        // created, to briefly hint to the user that UI controls
-        // are available.
-        //delayedHide(100)
-        hide()
-    }
-
-    override fun onWindowFocusChanged(hasFocus: Boolean) {
-        super.onWindowFocusChanged(hasFocus)
-
-        if (hasFocus) delayedHide(100)
-    }
-
-
     // Hide splash and display main menu instead
     private fun onSplashScreenClicked() {
         if (splashAnimating) return
@@ -59,14 +43,35 @@ class MainMenuActivity : AppCompatActivity() {
 
 
 
+    fun onLoginClicked() {
+        startActivity(Intent(this@MainMenuActivity, LoginActivity::class.java))
+    }
+
+    fun onRegisterClicked() {
+        startActivity(Intent(this@MainMenuActivity, RegisterActivity::class.java))
+    }
+
 
 
     ///////// UI HIDING GARBAGE
+    override fun onPostCreate(savedInstanceState: Bundle?) {
+        super.onPostCreate(savedInstanceState)
+
+        hide()
+    }
+
+    override fun onWindowFocusChanged(hasFocus: Boolean) {
+        super.onWindowFocusChanged(hasFocus)
+
+        if (hasFocus) delayedHide(100)
+    }
+
+
     private fun hide() {
         // Hide UI first
         supportActionBar?.hide()
 
-        mHideHandler.postDelayed(mHidePart2Runnable, UI_ANIMATION_DELAY.toLong())
+        mHideHandler.postDelayed(mHidePart2Runnable, 300.toLong())
 
         // Hide the status bar.
         window.decorView.systemUiVisibility = View.SYSTEM_UI_FLAG_FULLSCREEN
@@ -84,6 +89,8 @@ class MainMenuActivity : AppCompatActivity() {
         mHideHandler.postDelayed(mHideRunnable, delayMillis.toLong())
     }
 
+    private val mHideRunnable = Runnable { hide() }
+
     private val mHideHandler = Handler()
     private val mHidePart2Runnable = Runnable {
         // Delayed removal of status and navigation bar
@@ -96,37 +103,7 @@ class MainMenuActivity : AppCompatActivity() {
                 View.SYSTEM_UI_FLAG_FULLSCREEN or
                 View.SYSTEM_UI_FLAG_LAYOUT_STABLE or
                 View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY or
-                View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION or
-                View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
-    }
-    private val mHideRunnable = Runnable { hide() }
-    /**
-     * Touch listener to use for in-layout UI controls to delay hiding the
-     * system UI. This is to prevent the jarring behavior of controls going away
-     * while interacting with activity UI.
-     */
-    private val mDelayHideTouchListener = View.OnTouchListener { _, _ ->
-        delayedHide(AUTO_HIDE_DELAY_MILLIS)
-        false
-    }
-
-    companion object {
-        /**
-         * Whether or not the system UI should be auto-hidden after
-         * [AUTO_HIDE_DELAY_MILLIS] milliseconds.
-         */
-        private val AUTO_HIDE = true
-
-        /**
-         * If [AUTO_HIDE] is set, the number of milliseconds to wait after
-         * user interaction before hiding the system UI.
-         */
-        private val AUTO_HIDE_DELAY_MILLIS = 3000
-
-        /**
-         * Some older devices needs a small delay between UI widget updates
-         * and a change of the status and navigation bar.
-         */
-        private val UI_ANIMATION_DELAY = 300
+                View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION /*or
+                View.SYSTEM_UI_FLAG_HIDE_NAVIGATION*/
     }
 }

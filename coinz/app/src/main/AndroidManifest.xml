@@ -20,6 +20,36 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        <activity
+            android:name=".RegisterActivity"
+            android:configChanges="orientation|keyboardHidden|screenSize"
+            android:label="@string/title_activity_register"
+            android:parentActivityName=".MainMenuActivity"
+            android:theme="@style/FullscreenTheme">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="eu.zerovector.coinz.MainMenuActivity" />
+        </activity>
+        <activity
+            android:name=".LoginActivity"
+            android:configChanges="orientation|keyboardHidden|screenSize"
+            android:label="@string/title_activity_login"
+            android:parentActivityName=".MainMenuActivity"
+            android:theme="@style/FullscreenTheme">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="eu.zerovector.coinz.MainMenuActivity" />
+        </activity>
+        <activity
+            android:name=".GameActivity"
+            android:configChanges="orientation|keyboardHidden|screenSize"
+            android:label="@string/title_activity_game"
+            android:parentActivityName=".LoginActivity"
+            android:theme="@style/FullscreenTheme">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="eu.zerovector.coinz.LoginActivity" />
+        </activity>
     </application>
 
 </manifest>
