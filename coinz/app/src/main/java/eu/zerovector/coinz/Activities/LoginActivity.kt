@@ -1,7 +1,8 @@
-package eu.zerovector.coinz
+package eu.zerovector.coinz.Activities
 
 import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
+import eu.zerovector.coinz.R
 
 
 class LoginActivity : AppCompatActivity() {

@@ -1,8 +1,9 @@
-package eu.zerovector.coinz
+package eu.zerovector.coinz.Activities
 
 import android.content.Intent
 import android.os.Bundle
 import android.view.View
+import eu.zerovector.coinz.R
 import kotlinx.android.synthetic.main.activity_main_menu.*
 
 class MainMenuActivity : BaseFullscreenActivity() {
@@ -18,8 +19,9 @@ class MainMenuActivity : BaseFullscreenActivity() {
         // Set up the user interaction to manually show or hide the system UI.
         layoutSplash.setOnClickListener { onSplashScreenClicked() }
 
-
-        // Set up the swipe detection for the registration.
+        // Also set the visibility layouts up
+        layoutMainMenu.visibility = View.INVISIBLE
+        layoutSplash.visibility = View.VISIBLE
 
     }
 

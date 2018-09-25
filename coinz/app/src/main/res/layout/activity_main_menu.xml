@@ -6,7 +6,7 @@
     android:layout_height="match_parent"
     android:background="#0099cc"
     android:theme="@android:style/Theme.Black.NoTitleBar.Fullscreen"
-    tools:context=".MainMenuActivity"
+    tools:context=".Activities.MainMenuActivity"
     tools:ignore="HardcodedText" >
 
 
@@ -27,7 +27,7 @@
         android:visibility="visible">
 
         <LinearLayout
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:orientation="vertical"
             app:layout_constraintBottom_toBottomOf="parent"
@@ -35,10 +35,36 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent">
 
+            <TextView
+                android:id="@+id/lblTitle2"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:text="COINZ"
+                android:textAlignment="center"
+                android:textColor="@color/basicGrey"
+                android:textSize="56sp" />
+
+            <TextView
+                android:id="@+id/lblAGameOfSpies2"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="10dp"
+                android:gravity="center"
+                android:text="A game of spies"
+                android:textColor="@color/basicGrey" />
+
+            <Space
+                android:layout_width="match_parent"
+                android:layout_height="10dp"
+                android:visibility="visible" />
+
             <Button
                 android:id="@+id/btnLogin"
                 android:layout_width="match_parent"
                 android:layout_height="30dp"
+                android:layout_marginEnd="32dp"
+                android:layout_marginStart="32dp"
                 android:background="@drawable/generic_button"
                 android:onClick="onLoginClicked"
                 android:text="LOGIN"
@@ -55,8 +81,10 @@
 
             <Button
                 android:id="@+id/btnRegister"
-                android:layout_width="200dp"
+                android:layout_width="match_parent"
                 android:layout_height="30dp"
+                android:layout_marginEnd="32dp"
+                android:layout_marginStart="32dp"
                 android:background="@drawable/generic_button"
                 android:onClick="onRegisterClicked"
                 android:text="REGISTER"
@@ -76,7 +104,7 @@
         android:id="@+id/layoutSplash"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:visibility="invisible">
+        android:visibility="visible">
 
         <TextView
             android:id="@+id/lblTitle"
@@ -96,7 +124,7 @@
             app:layout_constraintTop_toTopOf="parent" />
 
         <TextView
-            android:id="@+id/textView6"
+            android:id="@+id/lblAGameOfSpies"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginEnd="8dp"
@@ -109,17 +137,17 @@
             app:layout_constraintTop_toBottomOf="@+id/lblTitle" />
 
         <TextView
-            android:id="@+id/textView7"
+            android:id="@+id/lblTapToProceed"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="10dp"
             android:layout_marginEnd="8dp"
             android:layout_marginStart="8dp"
-            android:text="(Tap anywhere to proceed...)"
+            android:layout_marginTop="10dp"
+            android:text="(Tap anywhere to proceed)"
             android:textColor="@color/basicGrey"
-            app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent" />
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/lblAGameOfSpies" />
 
     </android.support.constraint.ConstraintLayout>
 

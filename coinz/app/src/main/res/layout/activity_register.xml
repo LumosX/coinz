@@ -5,8 +5,8 @@
     android:id="@+id/layoutRegisterScreen"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#0099cc"
-    tools:context=".RegisterActivity"
+    android:background="@color/Black"
+    tools:context=".Activities.RegisterActivity"
     tools:ignore="HardcodedText">
 
     <!-- The primary full-screen view. This can be replaced with whatever view
@@ -16,26 +16,28 @@
     <!-- This FrameLayout insets its children based on system windows using
          android:fitsSystemWindows. -->
 
-    <ImageView
-        android:id="@+id/bgE2"
+    <android.support.constraint.ConstraintLayout
+        android:id="@+id/layoutRegisterDetails"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:adjustViewBounds="false"
-        android:cropToPadding="false"
-        android:scaleType="centerCrop"
-        android:visibility="visible"
-        app:srcCompat="@drawable/splash_screen" />
+        android:visibility="visible">
 
-    <android.support.constraint.ConstraintLayout
-        android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        <ImageView
+            android:id="@+id/bgE2"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:adjustViewBounds="false"
+            android:cropToPadding="false"
+            android:scaleType="centerCrop"
+            android:visibility="visible"
+            app:srcCompat="@drawable/splash_screen" />
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginBottom="8dp"
-            android:layout_marginEnd="8dp"
-            android:layout_marginStart="8dp"
+            android:layout_marginEnd="12dp"
+            android:layout_marginStart="12dp"
             android:layout_marginTop="8dp"
             android:orientation="vertical"
             app:layout_constraintBottom_toBottomOf="parent"
@@ -44,15 +46,238 @@
             app:layout_constraintTop_toTopOf="parent">
 
             <EditText
-                android:id="@+id/tbUsername"
+                android:id="@+id/tbEmail"
+                style="@style/GenericEditText"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:background="@color/Black"
+                android:layout_marginBottom="10dp"
+                android:hint="Email (must not be used before)"
+                android:inputType="textEmailAddress" />
+
+            <EditText
+                android:id="@+id/tbPassword"
+                style="@style/GenericEditText"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_marginBottom="10dp"
+                android:hint="Password (6+ chars, at least one digit)"
+                android:inputType="textPassword" />
+
+            <EditText
+                android:id="@+id/tbConfirmPassword"
+                style="@style/GenericEditText"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_marginBottom="10dp"
+                android:hint="Confirm password"
+                android:inputType="textPassword" />
+
+            <Space
+                android:layout_width="match_parent"
+                android:layout_height="10dp"
+                android:visibility="visible" />
+
+            <EditText
+                android:id="@+id/tbUsername"
+                style="@style/GenericEditText"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_marginBottom="10dp"
                 android:hint="Username (3+ chars, unique)"
                 android:inputType="textPersonName" />
 
+            <TextView
+                android:id="@+id/lblChosenTeam"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="10dp"
+                android:text="SELECTED TEAM: ONE OR THE OTHER"
+                android:textAlignment="center"
+                android:textColor="@color/basicGrey" />
+
+            <Space
+                android:layout_width="match_parent"
+                android:layout_height="10dp"
+                android:visibility="visible" />
+
+            <Button
+                android:id="@+id/btnConfirmDetails"
+                android:layout_width="match_parent"
+                android:layout_height="30dp"
+                android:layout_marginEnd="20dp"
+                android:layout_marginStart="20dp"
+                android:background="@drawable/generic_button"
+                android:gravity="center"
+                android:onClick="onConfirmClicked"
+                android:text="REGISTER AND START GAME" />
+
+            <Space
+                android:layout_width="match_parent"
+                android:layout_height="40dp"
+                android:visibility="visible" />
+
 
         </LinearLayout>
+    </android.support.constraint.ConstraintLayout>
+
+    <android.support.constraint.ConstraintLayout
+        android:id="@+id/layoutTeamSelector"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:visibility="invisible"
+        tools:ignore="HardcodedText">
+
+        <android.support.constraint.ConstraintLayout
+            android:id="@+id/layoutE11"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:visibility="visible">
+
+            <android.support.constraint.Guideline
+                android:id="@+id/guideHorMid"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                app:layout_constraintGuide_percent="0.5" />
+
+            <ImageView
+                android:id="@+id/bgE11"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:adjustViewBounds="false"
+                android:cropToPadding="false"
+                android:scaleType="center"
+                app:srcCompat="@drawable/main_menu_e11" />
+
+            <ImageView
+                android:id="@+id/iconE11"
+                android:layout_width="160dp"
+                android:layout_height="160dp"
+                android:layout_alignParentStart="true"
+                android:layout_centerVertical="true"
+                app:layout_constraintStart_toStartOf="@+id/bgE11"
+                app:layout_constraintTop_toBottomOf="@+id/guideHorMid"
+                app:srcCompat="@drawable/icon_e11" />
+
+            <TextView
+                android:id="@+id/nameE11"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentStart="true"
+                android:layout_marginStart="10dp"
+                android:text="Eleventh Echelon"
+                android:textColor="@color/lightGrey"
+                android:textSize="18sp"
+                app:layout_constraintBottom_toTopOf="@+id/iconE11"
+                app:layout_constraintStart_toStartOf="parent" />
+
+            <TextView
+                android:id="@+id/infoE11"
+                android:layout_width="152dp"
+                android:layout_height="wrap_content"
+                android:layout_alignEnd="@+id/iconE11"
+                android:layout_alignParentBottom="true"
+                android:layout_marginStart="10dp"
+                android:layout_marginTop="10dp"
+                android:singleLine="false"
+                android:text="A black-ops intelligence and counterintelligence division for the MI5."
+                android:textColor="@color/lightGrey"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/iconE11" />
+
+
+        </android.support.constraint.ConstraintLayout>
+
+        <android.support.constraint.ConstraintLayout
+            android:id="@+id/layoutCD"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:visibility="invisible">
+
+            <android.support.constraint.Guideline
+                android:id="@+id/guideHorMidCD"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                app:layout_constraintGuide_percent="0.5" />
+
+            <ImageView
+                android:id="@+id/bgCD"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:adjustViewBounds="false"
+                android:cropToPadding="false"
+                android:scaleType="center"
+                app:srcCompat="@drawable/main_menu_cd" />
+
+            <ImageView
+                android:id="@+id/iconCD"
+                android:layout_width="160dp"
+                android:layout_height="160dp"
+                android:layout_alignParentStart="true"
+                android:layout_centerVertical="true"
+                app:layout_constraintBottom_toTopOf="@+id/guideHorMidCD"
+                app:layout_constraintEnd_toEndOf="@+id/bgCD"
+                app:srcCompat="@drawable/icon_cd" />
+
+            <TextView
+                android:id="@+id/nameCD"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentStart="true"
+                android:layout_marginEnd="10dp"
+                android:text="Crimson Dawn"
+                android:textColor="@color/basicGrey"
+                android:textSize="18sp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/iconCD" />
+
+            <TextView
+                android:id="@+id/infoCD"
+                android:layout_width="152dp"
+                android:layout_height="wrap_content"
+                android:layout_alignEnd="@+id/iconCD"
+                android:layout_alignParentBottom="true"
+                android:layout_marginBottom="10dp"
+                android:layout_marginEnd="10dp"
+                android:gravity="right"
+                android:singleLine="false"
+                android:text="A ruthless band of high-tech mercenaries loyal to nothing but their next paycheck."
+                android:textColor="@color/basicGrey"
+                app:layout_constraintBottom_toTopOf="@+id/iconCD"
+                app:layout_constraintEnd_toEndOf="parent" />
+
+
+        </android.support.constraint.ConstraintLayout>
+
+        <TextView
+            android:id="@+id/lblSwipeToSelect"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="8dp"
+            android:layout_marginStart="8dp"
+            android:layout_marginTop="8dp"
+            android:text="(Swipe left or right to select team)"
+            android:textAlignment="center"
+            android:textColor="@color/basicGrey"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <Button
+            android:id="@+id/btnSelectTeam"
+            android:layout_width="match_parent"
+            android:layout_height="30dp"
+            android:layout_marginEnd="32dp"
+            android:layout_marginStart="32dp"
+            android:layout_marginTop="10dp"
+            android:background="@drawable/generic_button"
+            android:gravity="center"
+            android:onClick="onTeamSelected"
+            android:text="SELECT TEAM"
+            app:layout_constraintTop_toBottomOf="@id/lblSwipeToSelect" />
+
+
     </android.support.constraint.ConstraintLayout>
 
 </FrameLayout>

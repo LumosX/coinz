@@ -1,6 +1,7 @@
-package eu.zerovector.coinz
+package eu.zerovector.coinz.Activities
 
 import android.os.Bundle
+import eu.zerovector.coinz.R
 
 
 class GameActivity : BaseFullscreenActivity() {

@@ -29,10 +29,12 @@
 
     <style name="AppTheme.PopupOverlay" parent="ThemeOverlay.AppCompat.Light" />
 
-    <style name="viewCustom">
-        <item name="android:layout_width">match_parent</item>
-        <item name="android:layout_height">wrap_content</item>
-        <item name="android:layout_margin">8dp</item>
+    <!-- CUSTOM STYLES -->
+    <!-- EditTexts for the registration/login screens -->
+    <style name="GenericEditText">
+        <item name="android:textColor">@color/darkGrey</item>
+        <item name="android:backgroundTint">@color/basicGrey</item>
+        <item name="android:textColorHint">@color/darkGrey</item>
     </style>
 
 </resources>
