@@ -8,6 +8,9 @@ import android.view.MotionEvent
 import android.view.View
 import android.widget.Toast
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.database.DatabaseReference
+import com.google.firebase.database.FirebaseDatabase
+import eu.zerovector.coinz.Data.Team
 import eu.zerovector.coinz.OnSwipeListener
 import eu.zerovector.coinz.R
 import kotlinx.android.synthetic.main.activity_register.*
@@ -19,8 +22,8 @@ class RegisterActivity : BaseFullscreenActivity(), View.OnTouchListener {
     private lateinit var gestureDetector: GestureDetector
 
     // Firebase stuff
-    /*private var fbDBRef: DatabaseReference? = null
-    private var fbDb: Firebased? = null*/
+    private var userDBBranch: DatabaseReference? = null
+    private var fbDB: FirebaseDatabase? = null
     private var fbAuth: FirebaseAuth? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -52,9 +55,10 @@ class RegisterActivity : BaseFullscreenActivity(), View.OnTouchListener {
         /*(layoutTeamSelector.layoutParams as ViewGroup.MarginLayoutParams)
             .setMargins(0, 0, 0, getNavigationBarSize(applicationContext).y)*/
 
-        // Grab firebase instance
+        // Grab firebase instances
         fbAuth = FirebaseAuth.getInstance()
-
+        fbDB = FirebaseDatabase.getInstance()
+        userDBBranch = fbDB!!.reference!!.child("Users")
 
     }
 
@@ -106,8 +110,13 @@ class RegisterActivity : BaseFullscreenActivity(), View.OnTouchListener {
 
                     // If all's well, make a toast.
                     if (task.isSuccessful) {
-                        //val firebaseUser = this!!.fbAuth!!.currentUser!!
                         Toast.makeText(applicationContext, "Registration successful!", Toast.LENGTH_SHORT).show()
+
+                        // Add the user data to the database
+                        val userBranch = userDBBranch!!.child(fbAuth!!.currentUser!!.uid)
+                        userBranch.child("username").setValue(tbUsername.text.toString())
+                        userBranch.child("team").setValue((if (visibleTeamE11) Team.EleventhEchelon else Team.CrimsonDawn))
+
                     } else {
                         waitDialog.hide()
                         dialogBuilder = AlertDialog.Builder(this@RegisterActivity)
