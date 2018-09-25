@@ -50,6 +50,7 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="eu.zerovector.coinz.LoginActivity" />
         </activity>
+        <activity android:name=".BaseFullscreenActivity" />
     </application>
 
 </manifest>
