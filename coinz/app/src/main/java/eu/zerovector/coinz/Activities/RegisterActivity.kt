@@ -2,6 +2,7 @@ package eu.zerovector.coinz.Activities
 
 import android.annotation.SuppressLint
 import android.app.AlertDialog
+import android.content.Intent
 import android.os.Bundle
 import android.view.GestureDetector
 import android.view.MotionEvent
@@ -22,9 +23,9 @@ class RegisterActivity : BaseFullscreenActivity(), View.OnTouchListener {
     private lateinit var gestureDetector: GestureDetector
 
     // Firebase stuff
-    private var userDBBranch: DatabaseReference? = null
-    private var fbDB: FirebaseDatabase? = null
-    private var fbAuth: FirebaseAuth? = null
+    private lateinit var userDBBranch: DatabaseReference
+    private lateinit var fbDB: FirebaseDatabase
+    private lateinit var fbAuth: FirebaseAuth
 
     override fun onCreate(savedInstanceState: Bundle?) {
 
@@ -37,7 +38,7 @@ class RegisterActivity : BaseFullscreenActivity(), View.OnTouchListener {
         teamSelectorVisible = true
         toggleSelectedTeam(true) // select eleventh echelon by default
 
-        gestureDetector = GestureDetector(this, object : OnSwipeListener() {
+        gestureDetector = GestureDetector(this, object: OnSwipeListener() {
             override fun onSwipe(direction: Direction): Boolean {
                 // Swipe left for Eleventh Echelon, swipe right for Crimson Dawn
                 if (direction == Direction.left) toggleSelectedTeam(true)
@@ -58,7 +59,7 @@ class RegisterActivity : BaseFullscreenActivity(), View.OnTouchListener {
         // Grab firebase instances
         fbAuth = FirebaseAuth.getInstance()
         fbDB = FirebaseDatabase.getInstance()
-        userDBBranch = fbDB!!.reference!!.child("Users")
+        userDBBranch = fbDB.reference.child("Users")
 
     }
 
@@ -96,13 +97,13 @@ class RegisterActivity : BaseFullscreenActivity(), View.OnTouchListener {
         }
 
 
-        // If the data validates, register.
+        // If the data "validates", register.
         var dialogBuilder = AlertDialog.Builder(this@RegisterActivity)
                 .setMessage("Attempting to register... Please wait.")
-        var waitDialog = dialogBuilder.create()
+        val waitDialog = dialogBuilder.create()
         waitDialog.show()
 
-        fbAuth!!
+        fbAuth
                 .createUserWithEmailAndPassword(tbEmail.text.toString(), tbPassword.text.toString())
                 .addOnCompleteListener { task ->
                     // No matter the result, hide the waiting dialog box.
@@ -113,16 +114,19 @@ class RegisterActivity : BaseFullscreenActivity(), View.OnTouchListener {
                         Toast.makeText(applicationContext, "Registration successful!", Toast.LENGTH_SHORT).show()
 
                         // Add the user data to the database
-                        val userBranch = userDBBranch!!.child(fbAuth!!.currentUser!!.uid)
+                        val userBranch = userDBBranch.child(fbAuth.currentUser!!.uid)
                         userBranch.child("username").setValue(tbUsername.text.toString())
                         userBranch.child("team").setValue((if (visibleTeamE11) Team.EleventhEchelon else Team.CrimsonDawn))
+
+                        // Move to the new activity as well.
+                        startActivity(Intent(this@RegisterActivity, GameActivity::class.java))
 
                     } else {
                         waitDialog.hide()
                         dialogBuilder = AlertDialog.Builder(this@RegisterActivity)
                                 .setMessage("Registration failed!\n${task.exception?.message}")
                                 .setNeutralButton("Close", null)
-                        var failureDialog = dialogBuilder.create()
+                        val failureDialog = dialogBuilder.create()
                         failureDialog.show()
                     }
                 }
