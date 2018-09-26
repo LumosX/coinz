@@ -41,6 +41,11 @@ open class BaseFullscreenActivity : AppCompatActivity() {
         if (hasFocus) delayedHide(100)
     }
 
+    override fun onResume() {
+        super.onResume()
+        hide()
+    }
+
 
     private fun hide() {
         // Hide UI first

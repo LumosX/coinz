@@ -39,6 +39,7 @@ class LoginActivity : BaseFullscreenActivity() {
 
                     if (task.isSuccessful) {
                         // If the login is successful, we just need to move to the new activity.
+                        finish()
                         startActivity(Intent(this@LoginActivity, GameActivity::class.java))
 
                     } else {

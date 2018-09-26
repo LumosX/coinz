@@ -9,8 +9,7 @@ import android.view.MotionEvent
 import android.view.View
 import android.widget.Toast
 import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.database.DatabaseReference
-import com.google.firebase.database.FirebaseDatabase
+import com.google.firebase.database.*
 import eu.zerovector.coinz.Data.Team
 import eu.zerovector.coinz.OnSwipeListener
 import eu.zerovector.coinz.R
@@ -19,7 +18,7 @@ import kotlinx.android.synthetic.main.activity_register.*
 
 class RegisterActivity : BaseFullscreenActivity(), View.OnTouchListener {
     private var teamSelectorVisible = true
-    private var visibleTeamE11 = false
+    private var pickedTeamIsE11 = false
     private lateinit var gestureDetector: GestureDetector
 
     // Firebase stuff
@@ -38,7 +37,7 @@ class RegisterActivity : BaseFullscreenActivity(), View.OnTouchListener {
         teamSelectorVisible = true
         toggleSelectedTeam(true) // select eleventh echelon by default
 
-        gestureDetector = GestureDetector(this, object: OnSwipeListener() {
+        gestureDetector = GestureDetector(this, object : OnSwipeListener() {
             override fun onSwipe(direction: Direction): Boolean {
                 // Swipe left for Eleventh Echelon, swipe right for Crimson Dawn
                 if (direction == Direction.left) toggleSelectedTeam(true)
@@ -82,54 +81,86 @@ class RegisterActivity : BaseFullscreenActivity(), View.OnTouchListener {
     }
 
     fun onConfirmClicked(view: View) {
+        // First, set-up strings for ease of use
+        val email = tbEmail.text.toString().trim()
+        val pass = tbPassword.text.toString().trim()
+        val confirmPass = tbConfirmPassword.text.toString().trim()
+        val username = tbUsername.text.toString().trim()
+
         // Validate data.
         // username must be 3+ chars.
         var error: String? = null
-        if (!tbEmail.text.toString().matches("^[A-Za-z](.*)([@])(.+)(\\.)(.+)".toRegex())) error = "Email is not valid!"
-        else if (tbPassword.text.length < 6) error = "Password too short (must be 6+ chars)!"
-        else if (!tbPassword.text.contains(".*\\d+.*".toRegex())) error = "Password must contain a digit!"
-        else if (tbPassword.text.toString() != tbConfirmPassword.text.toString()) error = "Passwords don't match!"
-        else if (tbUsername.text.length < 3) error = "Username too short (must be 3+ chars)!"
+        if (!email.matches("^[A-Za-z](.*)([@])(.+)(\\.)(.+)".toRegex())) error = "Email is not valid!"
+        else if (pass.length < 6) error = "Password too short (must be 6+ chars)!"
+        else if (!pass.contains(".*\\d+.*".toRegex())) error = "Password must contain a digit!"
+        else if (pass != confirmPass) error = "Passwords don't match!"
+        else if (username.length < 3) error = "Username too short (must be 3+ chars)!"
 
         if (error != null) {
             Toast.makeText(applicationContext, error, Toast.LENGTH_SHORT).show()
             return
         }
 
-
-        // If the data "validates", register.
+        // Set a "waiting box" up.
         var dialogBuilder = AlertDialog.Builder(this@RegisterActivity)
                 .setMessage("Attempting to register... Please wait.")
         val waitDialog = dialogBuilder.create()
         waitDialog.show()
 
-        fbAuth
-                .createUserWithEmailAndPassword(tbEmail.text.toString(), tbPassword.text.toString())
-                .addOnCompleteListener { task ->
-                    // No matter the result, hide the waiting dialog box.
-                    waitDialog.hide()
+        // Whilst this is up, check to see if the username is not already taken.
+        userDBBranch.orderByChild("username").equalTo(username)
+                .addListenerForSingleValueEvent(object : ValueEventListener {
+                    override fun onDataChange(snap: DataSnapshot) {
+                        // If a user with this name exists, fail
+                        if (snap.value != null) {
+                            fail("Username already exists.")
+                        // Otherwise, don't fail.
+                        } else {
+                            // Indeed, if ALL data validates, register.
+                            // Callbacks inside callbacks inside callbacks inside callbacks inside ca...
 
-                    // If all's well, make a toast.
-                    if (task.isSuccessful) {
-                        Toast.makeText(applicationContext, "Registration successful!", Toast.LENGTH_SHORT).show()
+                            // If the data "validates", register.
+                            fbAuth
+                                    .createUserWithEmailAndPassword(tbEmail.text.toString(), tbPassword.text.toString())
+                                    .addOnCompleteListener { task ->
+                                        // No matter the result, hide the waiting dialog box.
+                                        waitDialog.hide()
 
-                        // Add the user data to the database
-                        val userBranch = userDBBranch.child(fbAuth.currentUser!!.uid)
-                        userBranch.child("username").setValue(tbUsername.text.toString())
-                        userBranch.child("team").setValue((if (visibleTeamE11) Team.EleventhEchelon else Team.CrimsonDawn))
+                                        // If all's well, make a toast.
+                                        if (task.isSuccessful) {
+                                            Toast.makeText(applicationContext, "Registration successful!", Toast.LENGTH_SHORT).show()
 
-                        // Move to the new activity as well.
-                        startActivity(Intent(this@RegisterActivity, GameActivity::class.java))
+                                            // Add the user data to the database
+                                            val userBranch = userDBBranch.child(fbAuth.currentUser!!.uid)
+                                            userBranch.child("username").setValue(tbUsername.text.toString())
+                                            userBranch.child("team").setValue((if (pickedTeamIsE11S) Team.EleventhEchelon else Team.CrimsonDawn))
 
-                    } else {
+                                            // Move to the new activity as well.
+                                            finish()
+                                            startActivity(Intent(this@RegisterActivity, GameActivity::class.java))
+
+                                        } else {
+                                            fail(task.exception?.message!!)
+                                        }
+                                    }
+                        }
+                    }
+
+                    override fun onCancelled(p0: DatabaseError) {
+                        fail("Could not validate username. Try again later.\n${p0.message}")
+                    }
+
+                    // and because this is essentially java-like, we can hack in this cheeky function.
+                    fun fail(innerError: String) {
                         waitDialog.hide()
                         dialogBuilder = AlertDialog.Builder(this@RegisterActivity)
-                                .setMessage("Registration failed!\n${task.exception?.message}")
+                                .setMessage("Registration failed!\n$innerError")
                                 .setNeutralButton("Close", null)
                         val failureDialog = dialogBuilder.create()
                         failureDialog.show()
                     }
-                }
+
+                })
     }
 
 
@@ -151,12 +182,12 @@ class RegisterActivity : BaseFullscreenActivity(), View.OnTouchListener {
     // This function shows/hides elements when the selected team (in the active team selector) changes
     @SuppressLint("SetTextI18n")
     private fun toggleSelectedTeam(isE11: bool) {
-        if (visibleTeamE11 == isE11) return // don't need to re-animate if it's already selected
+        if (pickedTeamIsE11 == isE11) return // don't need to re-animate if it's already selected
 
         // this only works if the team selector is currently active
         if (!teamSelectorVisible) return
 
-        visibleTeamE11 = isE11
+        pickedTeamIsE11 = isE11
         val activatedLayout = if (isE11) layoutE11 else layoutCD
         val deactivatedLayout = if (isE11) layoutCD else layoutE11
 
