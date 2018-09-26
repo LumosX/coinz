@@ -133,7 +133,7 @@ class RegisterActivity : BaseFullscreenActivity(), View.OnTouchListener {
                                             // Add the user data to the database
                                             val userBranch = userDBBranch.child(fbAuth.currentUser!!.uid)
                                             userBranch.child("username").setValue(tbUsername.text.toString())
-                                            userBranch.child("team").setValue((if (pickedTeamIsE11S) Team.EleventhEchelon else Team.CrimsonDawn))
+                                            userBranch.child("team").setValue((if (pickedTeamIsE11) Team.EleventhEchelon else Team.CrimsonDawn))
 
                                             // Move to the new activity as well.
                                             finish()
