@@ -1,15 +1,119 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:mapbox="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".Activities.Fragments.MapFragment">
+    android:orientation="vertical"
+    tools:context=".Activities.Fragments.MapFragment"
+    tools:ignore="HardcodedText">
 
-    <!-- TODO: Update blank fragment layout -->
-    <TextView
+    <Space
+        android:layout_width="match_parent"
+        android:layout_height="4dp" />
+
+    <LinearLayout
+        android:id="@+id/layoutGame"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/Black"
+        android:orientation="horizontal"
+        tools:context=".Activities.GameActivity">
+
+        <ImageView
+            android:id="@+id/imgGold"
+            android:layout_width="18dp"
+            android:layout_height="18dp"
+            android:layout_weight="1"
+            android:src="@drawable/icon_gold" />
+
+        <TextView
+            android:id="@+id/lblGold"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="25/25"
+            android:textColor="@color/basicGrey" />
+
+        <ImageView
+            android:id="@+id/imgDolr"
+            android:layout_width="18dp"
+            android:layout_height="18dp"
+            android:layout_weight="1"
+            android:src="@drawable/icon_dolr" />
+
+        <TextView
+            android:id="@+id/lblDolr"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="25/25"
+            android:textColor="@color/basicGrey" />
+
+        <ImageView
+            android:id="@+id/imgPeny"
+            android:layout_width="18dp"
+            android:layout_height="18dp"
+            android:layout_weight="1"
+            android:src="@drawable/icon_peny" />
+
+        <TextView
+            android:id="@+id/lblPeny"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="25/25"
+            android:textColor="@color/basicGrey" />
+
+        <ImageView
+            android:id="@+id/imgShil"
+            android:layout_width="18dp"
+            android:layout_height="18dp"
+            android:layout_weight="1"
+            android:src="@drawable/icon_shil" />
+
+        <TextView
+            android:id="@+id/lblShil"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="25/25"
+            android:textColor="@color/basicGrey" />
+
+        <ImageView
+            android:id="@+id/imgQuid"
+            android:layout_width="18dp"
+            android:layout_height="18dp"
+            android:layout_weight="1"
+            android:src="@drawable/icon_quid" />
+
+        <TextView
+            android:id="@+id/lblQuid"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="25/25"
+            android:textColor="@color/basicGrey" />
+
+    </LinearLayout>
+
+    <Space
+        android:layout_width="match_parent"
+        android:layout_height="4dp" />
+
+    <com.mapbox.mapboxsdk.maps.MapView
+        android:id="@+id/mapView"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:textColor="@color/lightGrey"
-        android:text="@string/hello_blank_fragment" />
+        mapbox:mapbox_cameraTargetLat="55.944425"
+        mapbox:mapbox_cameraTargetLng="-3.188396"
+        mapbox:mapbox_cameraZoom="15"
+        mapbox:mapbox_styleUrl="mapbox://styles/mapbox/streets-v10" >
 
-</FrameLayout>
+        <Space
+            android:layout_width="match_parent"
+            android:layout_height="4dp" />
+    </com.mapbox.mapboxsdk.maps.MapView>
+
+
+</LinearLayout>

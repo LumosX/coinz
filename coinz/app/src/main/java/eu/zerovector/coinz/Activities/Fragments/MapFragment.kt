@@ -1,107 +1,144 @@
 package eu.zerovector.coinz.Activities.Fragments
 
+import android.graphics.Color
 import android.os.Bundle
 import android.support.v4.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
+import com.mapbox.mapboxsdk.Mapbox
+import com.mapbox.mapboxsdk.annotations.PolygonOptions
+import com.mapbox.mapboxsdk.geometry.LatLng
+import com.mapbox.mapboxsdk.geometry.LatLngBounds
+import com.mapbox.mapboxsdk.maps.MapView
+import com.mapbox.mapboxsdk.maps.MapboxMap
+import com.mapbox.mapboxsdk.maps.OnMapReadyCallback
+import com.mapbox.mapboxsdk.plugins.locationlayer.LocationLayerPlugin
+import com.mapbox.mapboxsdk.plugins.locationlayer.modes.CameraMode
 import eu.zerovector.coinz.R
 
-// TODO: Rename parameter arguments, choose names that match
-// the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-private const val ARG_PARAM1 = "param1"
-private const val ARG_PARAM2 = "param2"
-
-/**
- * A simple [Fragment] subclass.
- * Activities that contain this fragment must implement the
- * [MapFragment.OnFragmentInteractionListener] interface
- * to handle interaction events.
- * Use the [MapFragment.newInstance] factory method to
- * create an instance of this fragment.
- *
- */
-class MapFragment : Fragment() {
-
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
-                              savedInstanceState: Bundle?): View? {
-        // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_map, container, false)
-    }
 
 
 
-/*    // TODO: Rename and change types of parameters
-    private var param1: String? = null
-    private var param2: String? = null
-    private var listener: OnFragmentInteractionListener? = null
+class MapFragment : Fragment(), OnMapReadyCallback {
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        arguments?.let {
-            param1 = it.getString(ARG_PARAM1)
-            param2 = it.getString(ARG_PARAM2)
-        }
-    }
+    private lateinit var mapView: MapView
+    private lateinit var mapboxMap: MapboxMap
+
+    private val minLat = 55.942617
+    private val maxLat = 55.946233
+    private val minLon = -3.192473
+    private val maxLon = -3.184319
+
+    // Set bounds as per the coursework
+    private val bounds = LatLngBounds.Builder()
+            .include(LatLng(maxLat, minLon))
+            .include(LatLng(minLat, maxLon))
+            .build()
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
                               savedInstanceState: Bundle?): View? {
-        // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_map2, container, false)
+
+        val view = inflater.inflate(R.layout.fragment_map, container, false)
+        view.setOnTouchListener { _, _ ->
+            Toast.makeText(context, "touch event intercepted by mapfragment", Toast.LENGTH_LONG).show()
+            false }
+
+        // Set our maps up
+        Mapbox.getInstance(context!!, getString(R.string.mapbox_access_token))
+
+        mapView = view.findViewById(R.id.mapView)
+        mapView.onCreate(savedInstanceState)
+        mapView.getMapAsync { mapboxMap -> onMapReady(mapboxMap) }
+
+        // Inflate the layout
+        return view
     }
 
-    // TODO: Rename method, update argument and hook method into UI event
-    fun onButtonPressed(uri: Uri) {
-        listener?.onFragmentInteraction(uri)
+
+    // Mapbox location plugin stuff
+    override fun onMapReady(mapboxMap: MapboxMap) {
+        this.mapboxMap = mapboxMap
+
+        // Permissions are handled elsewhere and should be available
+        enableLocationPlugin()
+
+
+        // Now show bounds and restrict map
+        showBoundsArea()
+        mapboxMap.setLatLngBoundsForCameraTarget(bounds)
+        mapboxMap.setMinZoomPreference(14.5)
     }
 
-    override fun onAttach(context: Context) {
-        super.onAttach(context)
-        if (context is OnFragmentInteractionListener) {
-            listener = context
-        } else {
-            throw RuntimeException(context.toString() + " must implement OnFragmentInteractionListener")
-        }
+    private fun showBoundsArea() {
+        // For this one we actually need to generate four polygons.
+        // We don't want to make the play area red, we want to make the EXTERNAL area red.
+        // Polygons with holes make this quite easy, actually...
+        val offset = 0.010000 // 1 km?
+
+        val largerBounds = LatLngBounds.Builder()
+                .include(LatLng(maxLat + offset, minLon - offset))
+                .include(LatLng(minLat - offset, maxLon + offset)).build()
+
+        val boundsPolygon = PolygonOptions()
+                .add(largerBounds.northWest)
+                .add(largerBounds.northEast)
+                .add(largerBounds.southEast)
+                .add(largerBounds.southWest)
+                .addHole(mutableListOf(bounds.northWest, bounds.northEast, bounds.southEast, bounds.southWest))
+        boundsPolygon.alpha(0.25f)
+        boundsPolygon.fillColor(Color.RED)
+        mapboxMap.addPolygon(boundsPolygon)
     }
 
-    override fun onDetach() {
-        super.onDetach()
-        listener = null
+
+    fun enableLocationPlugin() {
+        // Create an instance of the plugin. Adding in LocationLayerOptions is also an optional parameter
+        val locationLayerPlugin = LocationLayerPlugin(mapView, mapboxMap)
+
+        // also enable location tracking
+        locationLayerPlugin.isLocationLayerEnabled = true
+
+        // Set the plugin's camera mode
+        locationLayerPlugin.cameraMode = CameraMode.TRACKING
+        lifecycle.addObserver(locationLayerPlugin)
     }
 
-    *//**
-     * This interface must be implemented by activities that contain this
-     * fragment to allow an interaction in this fragment to be communicated
-     * to the activity and potentially other fragments contained in that
-     * activity.
-     *
-     *
-     * See the Android Training lesson [Communicating with Other Fragments]
-     * (http://developer.android.com/training/basics/fragments/communicating.html)
-     * for more information.
-     *//*
-    interface OnFragmentInteractionListener {
-        // TODO: Update argument type and name
-        fun onFragmentInteraction(uri: Uri)
+    override fun onStart() {
+        super.onStart()
+        mapView.onStart()
     }
 
-    companion object {
-        *//**
-         * Use this factory method to create a new instance of
-         * this fragment using the provided parameters.
-         *
-         * @param param1 Parameter 1.
-         * @param param2 Parameter 2.
-         * @return A new instance of fragment MapFragment.
-         *//*
-        // TODO: Rename and change types and number of parameters
-        @JvmStatic
-        fun newInstance(param1: String, param2: String) =
-                MapFragment().apply {
-                    arguments = Bundle().apply {
-                        putString(ARG_PARAM1, param1)
-                        putString(ARG_PARAM2, param2)
-                    }
-                }
-    }*/
+    override fun onResume() {
+        super.onResume()
+        mapView.onResume()
+    }
+
+    override fun onPause() {
+        super.onPause()
+        mapView.onPause()
+    }
+
+    override fun onStop() {
+        super.onStop()
+        mapView.onStop()
+    }
+
+    override fun onLowMemory() {
+        super.onLowMemory()
+        mapView.onLowMemory()
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        mapView.onDestroy()
+    }
+
+    override fun onSaveInstanceState(outState: Bundle) {
+        super.onSaveInstanceState(outState)
+        mapView.onSaveInstanceState(outState)
+    }
+
+
 }

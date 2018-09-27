@@ -23,6 +23,13 @@ android {
     dataBinding {
         enabled = true
     }
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
+    repositories {
+        mavenCentral()
+    }
 }
 
 dependencies {
@@ -41,6 +48,9 @@ dependencies {
 
     implementation 'com.ogaclejapan.smarttablayout:library:1.6.1@aar'
     implementation 'com.ogaclejapan.smarttablayout:utils-v4:1.6.1@aar'
+
+    implementation 'com.mapbox.mapboxsdk:mapbox-android-sdk:6.5.0'
+    implementation 'com.mapbox.mapboxsdk:mapbox-android-plugin-locationlayer:0.8.2'
 }
 
 apply plugin: 'com.google.gms.google-services'
