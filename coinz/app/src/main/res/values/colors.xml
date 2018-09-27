@@ -10,6 +10,7 @@
     <color name="lightGrey">#DDDDDD</color>
     <color name="basicGrey">#AAAAAA</color>
     <color name="darkGrey">#777777</color>
+    <color name="transparent">#00000000</color>
 
     <!-- MORE COLOURS!!!! these are off the internet -->
     <color name="White">#FFFFFF</color>

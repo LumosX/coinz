@@ -124,7 +124,7 @@ class RegisterActivity : BaseFullscreenActivity(), View.OnTouchListener {
                                     .createUserWithEmailAndPassword(tbEmail.text.toString(), tbPassword.text.toString())
                                     .addOnCompleteListener { task ->
                                         // No matter the result, hide the waiting dialog box.
-                                        waitDialog.hide()
+                                        waitDialog.dismiss()
 
                                         // If all's well, make a toast.
                                         if (task.isSuccessful) {
@@ -152,7 +152,7 @@ class RegisterActivity : BaseFullscreenActivity(), View.OnTouchListener {
 
                     // and because this is essentially java-like, we can hack in this cheeky function.
                     fun fail(innerError: String) {
-                        waitDialog.hide()
+                        waitDialog.dismiss()
                         dialogBuilder = AlertDialog.Builder(this@RegisterActivity)
                                 .setMessage("Registration failed!\n$innerError")
                                 .setNeutralButton("Close", null)

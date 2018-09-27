@@ -35,7 +35,7 @@ class LoginActivity : BaseFullscreenActivity() {
                 .signInWithEmailAndPassword(tbEmail.text.toString(), tbPassword.text.toString())
                 .addOnCompleteListener { task ->
                     // No matter the result, hide the waiting dialog box.
-                    waitDialog.hide()
+                    waitDialog.dismiss()
 
                     if (task.isSuccessful) {
                         // If the login is successful, we just need to move to the new activity.

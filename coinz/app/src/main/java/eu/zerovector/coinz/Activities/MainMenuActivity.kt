@@ -3,6 +3,7 @@ package eu.zerovector.coinz.Activities
 import android.content.Intent
 import android.os.Bundle
 import android.view.View
+import com.google.firebase.auth.FirebaseAuth
 import eu.zerovector.coinz.R
 import kotlinx.android.synthetic.main.activity_main_menu.*
 
@@ -36,12 +37,24 @@ class MainMenuActivity : BaseFullscreenActivity() {
         layoutSplash.animate().alpha(0.0f).setDuration(1000).withEndAction { layoutSplash.visibility = View.INVISIBLE }
     }
 
+    // Add a third button for quick logins for testing reasons
+    fun onTestLoginClicked(view: View) {
+        FirebaseAuth.getInstance()
+                .signInWithEmailAndPassword("test@test.com", "123456")
+                .addOnCompleteListener { task ->
+                    if (task.isSuccessful) {
+                        finish()
+                        startActivity(Intent(this@MainMenuActivity, GameActivity::class.java))
+                    }
+                }
+    }
 
-    fun onLoginClicked(view : View) {
+
+    fun onLoginClicked(view: View) {
         startActivity(Intent(this@MainMenuActivity, LoginActivity::class.java))
     }
 
-    fun onRegisterClicked(view : View) {
+    fun onRegisterClicked(view: View) {
         startActivity(Intent(this@MainMenuActivity, RegisterActivity::class.java))
     }
 }

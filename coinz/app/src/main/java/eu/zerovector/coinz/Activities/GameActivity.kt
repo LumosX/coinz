@@ -1,15 +1,13 @@
 package eu.zerovector.coinz.Activities
 
 import android.os.Bundle
-import android.util.Log
-import android.view.KeyEvent
 import android.widget.Toast
 import com.google.firebase.auth.FirebaseAuth
+import com.ogaclejapan.smarttablayout.utils.v4.FragmentPagerItemAdapter
+import com.ogaclejapan.smarttablayout.utils.v4.FragmentPagerItems
+import eu.zerovector.coinz.Activities.Fragments.MapFragment
 import eu.zerovector.coinz.R
-
-
-
-
+import kotlinx.android.synthetic.main.activity_game.*
 
 
 class GameActivity : BaseFullscreenActivity() {
@@ -26,27 +24,28 @@ class GameActivity : BaseFullscreenActivity() {
 
         // Get authentication reference, again
         fbAuth = FirebaseAuth.getInstance()
+
+
+        // Set the main viewPager up.
+        val adapter = FragmentPagerItemAdapter(
+                supportFragmentManager, FragmentPagerItems.with(this)
+                .add("Map", MapFragment::class.java)
+                .add("Bank", MapFragment::class.java)
+                .add("War", MapFragment::class.java)
+                .add("Stats", MapFragment::class.java)
+                .add("Mail", MapFragment::class.java)
+                .create())
+
+        viewPager.adapter = adapter
+        tabLayout.setViewPager(viewPager)
+
+
     }
 
 
-
-
+    //////////////////////// BACK BUTTON SHENANIGANS
     // Override the "back" button, so that we can safely log out the current account.
-    override fun onKeyDown(keyCode: Int, event: KeyEvent): Boolean {
-        if (Integer.parseInt(android.os.Build.VERSION.SDK) > 5
-                && keyCode == KeyEvent.KEYCODE_BACK
-                && event.repeatCount == 0) {
-            Log.d("CDA", "onKeyDown Called")
-            onBackPressed()
-            return true
-        }
-        return super.onKeyDown(keyCode, event)
-    }
-
-
     override fun onBackPressed() {
-        Log.d("CDA", "onBackPressed Called")
-
         // This should always work fine, because we don't allow access to this activity if the user isn't signed in yet
         if (fbAuth.currentUser != null) {
             fbAuth.signOut()
