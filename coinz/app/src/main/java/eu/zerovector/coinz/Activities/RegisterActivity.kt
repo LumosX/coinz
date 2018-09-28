@@ -11,6 +11,7 @@ import android.widget.Toast
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.*
 import eu.zerovector.coinz.Data.Team
+import eu.zerovector.coinz.Data.bool
 import eu.zerovector.coinz.OnSwipeListener
 import eu.zerovector.coinz.R
 import kotlinx.android.synthetic.main.activity_register.*

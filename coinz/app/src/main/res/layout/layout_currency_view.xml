@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/layoutCurrency"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:clickable="true"
+    android:background="@color/Black"
+    android:orientation="horizontal"
+    tools:layout_editor_absoluteY="10dp">
+
+    <ImageView
+        android:id="@+id/imgCurrency"
+        android:layout_width="130dp"
+        android:layout_height="match_parent"
+        android:layout_marginBottom="4dp"
+        android:layout_marginEnd="4dp"
+        android:layout_marginStart="4dp"
+        android:layout_marginTop="4dp"
+        android:layout_weight="1"
+        android:src="@drawable/icon_dolr" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="4dp"
+        android:layout_marginStart="6dp"
+        android:layout_weight="1"
+        android:orientation="vertical">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:orientation="horizontal">
+
+            <TextView
+                android:id="@+id/lblCurrencyName"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="4dp"
+                android:layout_weight="1"
+                android:gravity="center"
+                android:text="DOLR"
+                android:textAlignment="viewStart"
+                android:textColor="@color/lightGrey"
+                android:textSize="16sp" />
+
+            <Button
+                android:id="@+id/lblCurrencyBuy"
+                android:layout_width="match_parent"
+                android:layout_height="35dp"
+                android:layout_marginTop="4dp"
+                android:layout_weight="1"
+                android:background="@drawable/generic_button"
+                android:gravity="center"
+                android:text="BUY: 62.331"
+                android:textColor="@color/lightGrey"
+                android:textSize="16sp" />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:orientation="horizontal">
+
+            <TextView
+                android:id="@+id/lblCurrencyBalance"
+                android:layout_width="match_parent"
+                android:layout_height="40dp"
+                android:layout_marginTop="4dp"
+                android:layout_weight="1"
+                android:gravity="center"
+                android:text="9999999"
+                android:textAlignment="viewStart"
+                android:textColor="@color/lightGrey"
+                android:textSize="16sp" />
+
+            <Button
+                android:id="@+id/lblCurrencySell"
+                android:layout_width="match_parent"
+                android:layout_height="35dp"
+                android:layout_marginTop="4dp"
+                android:layout_weight="1"
+                android:background="@drawable/generic_button"
+                android:gravity="center"
+                android:text="SELL: 61.556"
+                android:textColor="@color/lightGrey"
+                android:textSize="16sp" />
+        </LinearLayout>
+
+    </LinearLayout>
+
+</LinearLayout>

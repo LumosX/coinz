@@ -9,28 +9,26 @@
     android:orientation="vertical"
     tools:context=".Activities.GameActivity">
 
-        <com.ogaclejapan.smarttablayout.SmartTabLayout
-            android:id="@+id/tabLayout"
-            android:layout_width="match_parent"
-            android:layout_height="36dp"
-            app:stl_distributeEvenly="true"
-            app:stl_defaultTabTextColor="@color/darkGrey"
-            app:stl_defaultTabTextHorizontalPadding="0dp"
-            app:stl_dividerColor="@color/darkGrey"
-            app:stl_dividerThickness="2dp"
-            app:stl_indicatorColor="@color/lightGrey"
-            app:stl_indicatorCornerRadius="0dp"
-            app:stl_indicatorGravity="center"
-            app:stl_indicatorInterpolation="linear"
-            app:stl_indicatorThickness="36dp"
-            app:stl_underlineColor="@color/transparent"
-            app:stl_underlineThickness="0dp"
-            />
+    <com.ogaclejapan.smarttablayout.SmartTabLayout
+        android:id="@+id/tabLayout"
+        android:layout_width="match_parent"
+        android:layout_height="36dp"
+        app:stl_defaultTabTextColor="@color/darkGrey"
+        app:stl_defaultTabTextHorizontalPadding="0dp"
+        app:stl_distributeEvenly="true"
+        app:stl_dividerColor="@color/darkGrey"
+        app:stl_dividerThickness="2dp"
+        app:stl_indicatorColor="@color/lightGrey"
+        app:stl_indicatorCornerRadius="0dp"
+        app:stl_indicatorGravity="center"
+        app:stl_indicatorInterpolation="linear"
+        app:stl_indicatorThickness="36dp"
+        app:stl_underlineColor="@color/transparent"
+        app:stl_underlineThickness="0dp" />
 
-    <!--<eu.zerovector.coinz.SmartViewPager-->
     <android.support.v4.view.ViewPager
-            android:id="@+id/viewPager"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent" />
+        android:id="@+id/viewPager"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
 
 </LinearLayout>

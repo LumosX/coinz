@@ -6,7 +6,6 @@ import android.support.v4.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Toast
 import com.mapbox.mapboxsdk.Mapbox
 import com.mapbox.mapboxsdk.annotations.PolygonOptions
 import com.mapbox.mapboxsdk.geometry.LatLng
@@ -41,9 +40,6 @@ class MapFragment : Fragment(), OnMapReadyCallback {
                               savedInstanceState: Bundle?): View? {
 
         val view = inflater.inflate(R.layout.fragment_map, container, false)
-        view.setOnTouchListener { _, _ ->
-            Toast.makeText(context, "touch event intercepted by mapfragment", Toast.LENGTH_LONG).show()
-            false }
 
         // Set our maps up
         Mapbox.getInstance(context!!, getString(R.string.mapbox_access_token))

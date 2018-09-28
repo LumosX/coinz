@@ -10,9 +10,6 @@ import android.support.v7.app.AppCompatActivity
 import android.view.*
 import java.lang.reflect.InvocationTargetException
 
-
-typealias bool = Boolean
-
 open class BaseFullscreenActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {

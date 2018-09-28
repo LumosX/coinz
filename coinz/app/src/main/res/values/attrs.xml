@@ -9,4 +9,10 @@
         <attr name="metaButtonBarButtonStyle" format="reference" />
     </declare-styleable>
 
+
+    <declare-styleable name="CurrencyView">
+        <attr name="currency" format="string" />
+    </declare-styleable>
+
+
 </resources>

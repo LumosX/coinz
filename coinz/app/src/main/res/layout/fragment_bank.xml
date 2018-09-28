@@ -1,15 +1,134 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".Activities.Fragments.BankFragment">
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="vertical"
+    android:clickable="true"
+    android:background="@color/Black"
+    tools:context=".Activities.Fragments.BankFragment"
+    tools:ignore="HardcodedText">
 
-    <!-- TODO: Update blank fragment layout -->
     <TextView
+        android:id="@+id/lblTitle"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:text="🇨🇭 Banque Suisse Secrète 🇨🇭"
+        android:textAlignment="center"
         android:textColor="@color/lightGrey"
-        android:text="@string/hello_blank_fragment" />
+        android:textSize="30sp" />
 
-</FrameLayout>
+    <TextView
+        android:id="@+id/lblWelcome"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="4dp"
+        android:gravity="center"
+        android:text="Welcome, username"
+        android:textAlignment="center"
+        android:textColor="@color/lightGrey"
+        android:textSize="16sp" />
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:layout_marginStart="10dp"
+        android:layout_marginEnd="10dp"
+        android:layout_marginTop="4dp"
+        android:layout_marginBottom="4dp"
+        android:background="@color/darkGrey"/>
+
+<!--    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">-->
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical" >
+
+            <TextView
+                android:id="@+id/lblWallets"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="4dp"
+                android:gravity="center"
+                android:text="WALLETS AND BALANCES:"
+                android:textAlignment="center"
+                android:textColor="@color/lightGrey"
+                android:textSize="16sp" />
+
+            <eu.zerovector.coinz.CurrencyView
+                android:id="@+id/layoutGold"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_marginTop="10dp"
+                app:currency="GOLD" />
+
+            <eu.zerovector.coinz.CurrencyView
+                android:id="@+id/layoutDolr"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_marginTop="10dp"
+                app:currency="DOLR" />
+
+            <eu.zerovector.coinz.CurrencyView
+                android:id="@+id/layoutPeny"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_marginTop="10dp"
+                app:currency="PENY" />
+
+            <eu.zerovector.coinz.CurrencyView
+                android:id="@+id/layoutShil"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_marginTop="10dp"
+                app:currency="SHIL" />
+
+            <eu.zerovector.coinz.CurrencyView
+                android:id="@+id/layoutQuid"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_marginTop="10dp"
+                app:currency="QUID" />
+
+            <View
+                android:id="@+id/view"
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:layout_marginBottom="4dp"
+                android:layout_marginEnd="10dp"
+                android:layout_marginStart="10dp"
+                android:layout_marginTop="4dp"
+                android:background="@color/darkGrey" />
+
+            <TextView
+                android:id="@+id/lblSpareChange"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="4dp"
+                android:gravity="center"
+                android:text="SPARE CHANGE:"
+                android:textAlignment="center"
+                android:textColor="@color/lightGrey"
+                android:textSize="16sp" />
+
+            <TextView
+                android:id="@+id/lblDepositQuota"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="4dp"
+                android:gravity="center"
+                android:text="Daily deposit quota: 0/25"
+                android:textAlignment="center"
+                android:textColor="@color/lightGrey"
+                android:textSize="16sp" />
+
+        </LinearLayout>
+    <!--</ScrollView>-->
+
+
+</LinearLayout>
