@@ -32,7 +32,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:text="25/25"
+            android:text="99999"
             android:textColor="@color/basicGrey" />
 
         <ImageView

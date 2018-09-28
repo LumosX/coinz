@@ -17,8 +17,15 @@ class CurrencyView : LinearLayout {
 
     private var currentView: View
     private lateinit var currency: Currency
+
     private var btnBuy: Button
     private var btnSell: Button
+    private var btnDeposit: Button
+
+    private var image: ImageView
+    private var lblName: TextView
+    private var lblBalance: TextView
+    private var lblChange: TextView
 
     constructor(context: Context) : this(context, null)
     constructor(context: Context, attrs: AttributeSet?) : this(context, attrs, 0)
@@ -33,8 +40,15 @@ class CurrencyView : LinearLayout {
             recycle()
         }
 
-        btnBuy = currentView.findViewById(R.id.lblCurrencyBuy)
-        btnSell = currentView.findViewById(R.id.lblCurrencySell)
+        // Bind views here. It's the most effective way to do it.
+        btnBuy = currentView.findViewById(R.id.btnCurrencyBuy)
+        btnSell = currentView.findViewById(R.id.btnCurrencySell)
+        btnDeposit = currentView.findViewById(R.id.btnCurrencyDeposit)
+
+        image = currentView.findViewById(R.id.imgCurrency)
+        lblName = currentView.findViewById(R.id.lblCurrencyName)
+        lblBalance = currentView.findViewById(R.id.lblCurrencyBalance)
+        lblChange = currentView.findViewById(R.id.lblCurrencyChange)
 
         UpdateData()
 
@@ -44,13 +58,17 @@ class CurrencyView : LinearLayout {
     @SuppressLint("SetTextI18n")
     public fun UpdateData() {
         // Set variables based on the current currency
-        currentView.findViewById<ImageView>(R.id.imgCurrency).setImageResource(currency.iconID)
-        currentView.findViewById<TextView>(R.id.lblCurrencyName).text = currency.name
-        currentView.findViewById<TextView>(R.id.lblCurrencyBalance).text = DataManager.GetBalance(currency).toString()
+        image.setImageResource(currency.iconID)
+        lblName.text = currency.name
+        lblBalance.text = "BANK: " + DataManager.GetBalance(currency).toString()
+        lblChange.text = "CHANGE: " + DataManager.GetChange(currency).toString() + "/" + DataManager.GetChangeLimit()
 
-        // Fancily set label visibility
+        // Fancily set button visibility
         btnBuy.visibility = if (currency.showBuySell) View.VISIBLE else View.INVISIBLE
         btnSell.visibility = btnBuy.visibility
+        btnDeposit.visibility = btnBuy.visibility
+        // applies to the "spare change" label as well, since GOLD doesn't have "change"
+        lblChange.visibility = btnBuy.visibility
 
         btnBuy.text = "BUY: " + DataManager.GetBuyPrice(currency)
         btnSell.text = "SELL: " + DataManager.GetSellPrice(currency)
@@ -67,6 +85,11 @@ class CurrencyView : LinearLayout {
 
     fun OnSellClicked() {
         MakeToast(context, "SELL CLICKED FOR CURRENCY $currency")
+    }
+
+    fun OnDepositClicked() {
+
+
     }
 
 }

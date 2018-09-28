@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:orientation="vertical"
-    android:clickable="true"
     android:background="@color/Black"
+    android:clickable="true"
+    android:orientation="vertical"
     tools:context=".Activities.Fragments.BankFragment"
     tools:ignore="HardcodedText">
 
@@ -31,23 +31,33 @@
         android:textColor="@color/lightGrey"
         android:textSize="16sp" />
 
+    <TextView
+        android:id="@+id/lblDepositQuota"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:text="Daily deposit quota: 0/25"
+        android:textAlignment="center"
+        android:textColor="@color/lightGrey"
+        android:textSize="16sp" />
+
     <View
         android:layout_width="match_parent"
         android:layout_height="1dp"
-        android:layout_marginStart="10dp"
-        android:layout_marginEnd="10dp"
-        android:layout_marginTop="4dp"
         android:layout_marginBottom="4dp"
-        android:background="@color/darkGrey"/>
+        android:layout_marginEnd="10dp"
+        android:layout_marginStart="10dp"
+        android:layout_marginTop="4dp"
+        android:background="@color/darkGrey" />
 
-<!--    <ScrollView
+    <ScrollView
         android:layout_width="match_parent"
-        android:layout_height="match_parent">-->
+        android:layout_height="match_parent">
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="vertical" >
+            android:orientation="vertical">
 
             <TextView
                 android:id="@+id/lblWallets"
@@ -95,40 +105,14 @@
                 android:layout_marginTop="10dp"
                 app:currency="QUID" />
 
-            <View
-                android:id="@+id/view"
-                android:layout_width="match_parent"
-                android:layout_height="1dp"
-                android:layout_marginBottom="4dp"
-                android:layout_marginEnd="10dp"
-                android:layout_marginStart="10dp"
-                android:layout_marginTop="4dp"
-                android:background="@color/darkGrey" />
-
-            <TextView
-                android:id="@+id/lblSpareChange"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="4dp"
-                android:gravity="center"
-                android:text="SPARE CHANGE:"
-                android:textAlignment="center"
-                android:textColor="@color/lightGrey"
-                android:textSize="16sp" />
-
-            <TextView
-                android:id="@+id/lblDepositQuota"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="4dp"
-                android:gravity="center"
-                android:text="Daily deposit quota: 0/25"
-                android:textAlignment="center"
-                android:textColor="@color/lightGrey"
-                android:textSize="16sp" />
+            <Space
+                android:layout_width="wrap_content"
+                android:layout_height="100dp"  />
 
         </LinearLayout>
-    <!--</ScrollView>-->
+
+
+    </ScrollView>
 
 
 </LinearLayout>
