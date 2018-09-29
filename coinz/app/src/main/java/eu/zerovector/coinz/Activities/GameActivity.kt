@@ -1,5 +1,6 @@
 package eu.zerovector.coinz.Activities
 
+import android.content.Context
 import android.os.Bundle
 import android.widget.Toast
 import com.google.firebase.auth.FirebaseAuth
@@ -8,8 +9,11 @@ import com.mapbox.android.core.permissions.PermissionsManager
 import com.ogaclejapan.smarttablayout.utils.v4.FragmentPagerItemAdapter
 import com.ogaclejapan.smarttablayout.utils.v4.FragmentPagerItems
 import eu.zerovector.coinz.Activities.Fragments.*
+import eu.zerovector.coinz.BuildConfig
 import eu.zerovector.coinz.R
 import kotlinx.android.synthetic.main.activity_game.*
+
+
 
 
 class GameActivity : BaseFullscreenActivity(), PermissionsListener {
@@ -42,7 +46,7 @@ class GameActivity : BaseFullscreenActivity(), PermissionsListener {
         viewPager.adapter = adapter
         tabLayout.setViewPager(viewPager)
 
-        viewPager
+        checkFirstRun()
 
         // Also request map permissions RIGHT NOW
         checkRequestLocPermissions()
@@ -75,6 +79,64 @@ class GameActivity : BaseFullscreenActivity(), PermissionsListener {
             Toast.makeText(this, "The game can't function without the requested permission.", Toast.LENGTH_LONG).show()
             finish()
         }
+    }
+
+
+    // Based on https://stackoverflow.com/a/30274315/668143
+    private fun checkFirstRun() {
+
+        val PREFS_NAME = "MyPrefsFile"
+        val PREF_VERSION_CODE_KEY = "version_code"
+        val DOESNT_EXIST = -1
+
+        // Get current version code
+        val currentVersionCode = BuildConfig.VERSION_CODE
+
+        // Get saved version code
+        val prefs = getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
+        val savedVersionCode = prefs.getInt(PREF_VERSION_CODE_KEY, DOESNT_EXIST)
+
+        // Check for first run or upgrade
+        //if (currentVersionCode == savedVersionCode) {
+        if (false) {
+
+            // This is just a normal run
+            return
+
+        } /*else if (savedVersionCode == DOESNT_EXIST) {
+            // New install, or the user purged the preferences
+        } else if (currentVersionCode > savedVersionCode) {
+            // Upgrade
+        }*/
+        else {
+            // TODO fix strings and so on, to make this a tutorial
+          /*  SpotlightView.Builder(this)
+                    .introAnimationDuration(400)
+                    .enableRevealAnimation(true)
+                    .performClick(true)
+                    .fadeinTextDuration(400)
+                    .headingTvColor(Color.parseColor("#eb273f"))
+                    .headingTvSize(32)
+                    .headingTvText("Love")
+                    .subHeadingTvColor(Color.parseColor("#ffffff"))
+                    .subHeadingTvSize(16)
+                    .subHeadingTvText("Like the picture?\nLet others know.")
+                    .maskColor(Color.parseColor("#dc000000"))
+                    .target(findViewById(R.id.tabLayout))
+                    .lineAnimDuration(400)
+                    .lineAndArcColor(Color.parseColor("#eb273f"))
+                    .dismissOnTouch(true)
+                    .dismissOnBackPress(true)
+                    .enableDismissAfterShown(true)
+                    .usageId("welcome 1") //UNIQUE ID
+                    .show()*/
+
+        }
+
+
+
+        // Update the shared preferences with the current version code
+        prefs.edit().putInt(PREF_VERSION_CODE_KEY, currentVersionCode).apply()
     }
 
 

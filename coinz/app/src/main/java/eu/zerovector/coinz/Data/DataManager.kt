@@ -4,6 +4,8 @@ class DataManager {
 
     // Stuff inside the companion object is static, apparently
     companion object {
+        public lateinit var currentUserData: AccountData
+
         public fun GetBalance(currency: Currency): Int {
             return 69 // FIXME make this work
         }
@@ -14,6 +16,10 @@ class DataManager {
 
         public fun GetChangeLimit() : Int {
             return 25
+        }
+
+        public fun GetDepositQuota() : Int {
+            return currentUserData.dailyDepositsLeft
         }
 
         public fun GetBuyPrice(currency: Currency): Double {

@@ -8,6 +8,13 @@ data class AccountData(
         // Experience! It determines levels, i.e. collection range and wallet sizes
         var experience: Int,
 
+        // Processing power, a.k.a. "compute", is the currency required to decrypt the daily messages and thus win the "war"
+        var compute: Int,
+
+        // Time-related things
+        var lastMapTimestamp: String,
+        var dailyDepositsLeft: Int,
+
         // Bank stuff
         var bankGold: Int,
         var bankDolr: Int,

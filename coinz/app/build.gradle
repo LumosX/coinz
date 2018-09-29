@@ -29,6 +29,9 @@ android {
     }
     repositories {
         mavenCentral()
+        maven {
+            url "https://jitpack.io"
+        }
     }
 }
 
@@ -51,6 +54,8 @@ dependencies {
 
     implementation 'com.mapbox.mapboxsdk:mapbox-android-sdk:6.5.0'
     implementation 'com.mapbox.mapboxsdk:mapbox-android-plugin-locationlayer:0.8.2'
+
+    implementation 'com.github.wooplr:Spotlight:1.2.3'
 }
 
 apply plugin: 'com.google.gms.google-services'

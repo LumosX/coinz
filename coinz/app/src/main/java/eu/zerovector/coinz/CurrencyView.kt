@@ -1,13 +1,15 @@
 package eu.zerovector.coinz
 
 import android.annotation.SuppressLint
+import android.app.AlertDialog
 import android.content.Context
 import android.util.AttributeSet
+import android.view.Gravity
 import android.view.View
-import android.widget.Button
-import android.widget.ImageView
-import android.widget.LinearLayout
-import android.widget.TextView
+import android.view.ViewGroup
+import android.widget.*
+import android.widget.SeekBar.OnSeekBarChangeListener
+import com.mapbox.mapboxsdk.Mapbox.getApplicationContext
 import eu.zerovector.coinz.Data.Currency
 import eu.zerovector.coinz.Data.DataManager
 import eu.zerovector.coinz.Extras.Companion.MakeToast
@@ -75,6 +77,7 @@ class CurrencyView : LinearLayout {
 
         btnBuy.setOnClickListener { OnBuyClicked() }
         btnSell.setOnClickListener { OnSellClicked() }
+        btnDeposit.setOnClickListener { OnDepositClicked() }
 
     }
 
@@ -87,8 +90,53 @@ class CurrencyView : LinearLayout {
         MakeToast(context, "SELL CLICKED FOR CURRENCY $currency")
     }
 
+    @SuppressLint("SetTextI18n")
     fun OnDepositClicked() {
+        val alert = AlertDialog.Builder(context)
 
+        alert.setTitle("DEPOSITING SPARE $currency")
+        alert.setMessage("The sum will be deposited to your $currency balance immediately.\nYour deposit quota will be reset tomorrow.")
+
+        val linear = LinearLayout(context)
+        linear.orientation = LinearLayout.VERTICAL
+
+        val text = TextView(context)
+        text.text = "Depositing 0/" + DataManager.GetDepositQuota()
+        text.gravity = Gravity.CENTER
+
+        val seek = SeekBar(context)
+        seek.min = 0
+        seek.max = DataManager.GetBalance(currency)
+        seek.keyProgressIncrement = 1
+        seek.setPadding(100, 10, 100, 10)
+        seek.setOnSeekBarChangeListener(object : OnSeekBarChangeListener {
+            override fun onStartTrackingTouch(seekBar: SeekBar?) {}
+
+            override fun onStopTrackingTouch(seekBar: SeekBar?) {}
+
+            override fun onProgressChanged(seekBar: SeekBar, progress: Int, fromUser: Boolean) {
+                val remainingQuota = DataManager.GetDepositQuota() - seek.max
+                text.text = "Depositing $currency $progress/${seek.max}\nRemaining daily quota: $remainingQuota"
+            }
+        })
+
+        linear.addView(seek)
+        linear.addView(text)
+        linear.layoutParams = LayoutParams(LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT)
+
+        alert.setView(linear)
+
+
+
+        alert.setPositiveButton("DEPOSIT") { dialog, id ->
+            Toast.makeText(getApplicationContext(), "OK Pressed", Toast.LENGTH_LONG).show()
+        }
+
+        alert.setNegativeButton("CANCEL") { dialog, id ->
+            Toast.makeText(getApplicationContext(), "Cancel Pressed", Toast.LENGTH_LONG).show()
+        }
+
+        alert.show()
 
     }
 
