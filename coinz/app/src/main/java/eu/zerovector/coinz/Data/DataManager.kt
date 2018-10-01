@@ -1,34 +1,230 @@
 package eu.zerovector.coinz.Data
 
+import android.content.Context
+import com.github.kittinunf.fuel.httpGet
+import com.github.kittinunf.result.Result
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.firestore.FirebaseFirestore
+import com.squareup.moshi.Moshi
+import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
+import eu.zerovector.coinz.Extras.Companion.MakeToast
+import java.util.*
+
 class DataManager {
 
     // Stuff inside the companion object is static, apparently
     companion object {
-        public lateinit var currentUserData: AccountData
+        // SharedPrefs constants
+        const val PREFS_NAME = "CoinZConfig"
+        const val PREF_VERSION_CODE_KEY = "version_code"
+        const val DOESNT_EXIST = -1
 
-        public fun GetBalance(currency: Currency): Int {
-            return 69 // FIXME make this work
+        private var UIListeners: MutableList<() -> Unit> = mutableListOf()
+
+
+        private lateinit var currentUserData: AccountData
+        var dailyTimestamp: String = ""
+        var currentCoinsCollected: HashSet<String> = hashSetOf() // the set of all coin IDs taken today.
+        var dailyPureRates: Map.Rates = Map.Rates(1.0, 1.0, 1.0, 1.0)
+
+        fun SetCurrentAccountData(userData: AccountData) {
+            currentUserData = userData
         }
 
-        public fun GetChange(currency: Currency): Int {
-            return 69 // FIXME make this work
+        fun UpdateLocalMap(context: Context) {
+            // Get current date, then compose json file URL address.
+            val calendar = Calendar.getInstance(TimeZone.getTimeZone("UTC"))
+            val day = String.format("%02d", calendar.get(Calendar.DAY_OF_MONTH))
+            val month = String.format("%02d", calendar.get(Calendar.MONTH) + 1) // java calendar months are zero-based for some ungodly reason
+            val year = calendar.get(Calendar.YEAR)
+
+            val currentMapURL = "http://homepages.inf.ed.ac.uk/stg/coinz/$year/$month/$day/coinzmap.geojson"
+
+            //Log.d("DEBUG", "pre download " + currentMapURL)
+
+            currentMapURL.httpGet().responseString { request, response, result ->
+                //do something with response
+                when (result) {
+                    is Result.Failure -> {
+                        val ex = result.getException()
+                        MakeToast(context, ex.message!!)
+                    }
+                    is Result.Success -> {
+                        val dataJson = result.get()
+
+                        val moshi = Moshi.Builder()
+                                .add(KotlinJsonAdapterFactory())
+                                .build()
+
+                        // And just like magic, this ACTUALLY WORKS
+                        val mapData = moshi.adapter(Map.Data::class.java).fromJson(dataJson)
+                        ProcessMapData(mapData!!)
+
+                    }
+                }
+            }
+
+            //Log.d("DEBUG", "post download call " + currentMapURL)
         }
 
-        public fun GetChangeLimit() : Int {
-            return 25
+        // This method processes the map data recovered from the geoJSON file and takes care of any Firebase updates necessary.
+        fun ProcessMapData(data: Map.Data) {
+            // First, do the easy stuff and update the "pure" buy/sell rates for the day. We don't need to keep those in the DB.
+            dailyPureRates = data.rates
+
+
+            // MAP DATA WORKFLOW:
+            // Every user "document" in the Firebase "users" collection will keep a subcollection called "Coins".
+            // This subcollection will consist of documents, each ID'd with the current daily timestamp.
+            // Every field in this document will be the ID of a taken coin. If a coin's in there, it's been taken already.
+
+            val allCoinsMap = hashMapOf<String, Map.CoinInfo>()
+            for (coin in data.features) {
+                val info = Map.CoinInfo(
+                        Currency.valueOf(coin.properties.currency),
+                        coin.properties.value,
+                        coin.geometry.coordinates[0],
+                        coin.geometry.coordinates[1]
+                )
+                allCoinsMap[coin.properties.id] = info
+            }
+
         }
 
-        public fun GetDepositQuota() : Int {
+        // Deposit an amount of "spare change" into the respective bank balance and update quota.
+        fun DepositCoins(currency: Currency, amount: Int) {
+            currentUserData.dailyDepositsLeft -= amount
+            when (currency) {
+                Currency.GOLD -> {} // Again, this should never happen
+                Currency.DOLR -> {
+                    currentUserData.balances.dolr += amount
+                    currentUserData.spares.dolr -= amount
+                }
+                Currency.PENY -> {
+                    currentUserData.balances.peny += amount
+                    currentUserData.spares.peny -= amount
+                }
+                Currency.SHIL -> {
+                    currentUserData.balances.shil += amount
+                    currentUserData.spares.shil -= amount
+                }
+                Currency.QUID -> {
+                    currentUserData.balances.quid += amount
+                    currentUserData.spares.quid -= amount
+                }
+            }
+
+            UpdateFirebaseData()
+            TriggerUIUpdates()
+        }
+
+        fun BuySellCoins(currency: Currency, currencyDelta: Double, goldDelta: Double) {
+            currentUserData.balanceGold += goldDelta
+            when (currency) {
+                Currency.GOLD -> {} // Again, this should never happen
+                Currency.DOLR -> {
+                    currentUserData.balances.dolr += currencyDelta
+                }
+                Currency.PENY -> {
+                    currentUserData.balances.peny += currencyDelta
+                }
+                Currency.SHIL -> {
+                    currentUserData.balances.shil += currencyDelta
+                }
+                Currency.QUID -> {
+                    currentUserData.balances.quid += currencyDelta
+                }
+            }
+
+            UpdateFirebaseData()
+            TriggerUIUpdates()
+        }
+
+        fun UpdateFirebaseData() {
+            val firestore = FirebaseFirestore.getInstance()
+            val curUserID = FirebaseAuth.getInstance().currentUser!!.uid
+            firestore.collection("Users").document(curUserID).set(currentUserData)
+        }
+
+
+        fun SubscribeForUIUpdates(function: () -> Unit) {
+            UIListeners.add(function)
+        }
+
+        private fun TriggerUIUpdates() {
+            for (listener in UIListeners) {
+                listener.invoke()
+            }
+        }
+
+
+
+        fun GetUsername(): String {
+            return currentUserData.username
+        }
+
+
+        fun GetBalance(currency: Currency): Double {
+            return when (currency) {
+                Currency.GOLD -> currentUserData.balanceGold // gold balance is separate
+                Currency.DOLR -> currentUserData.balances.dolr
+                Currency.PENY -> currentUserData.balances.peny
+                Currency.SHIL -> currentUserData.balances.shil
+                Currency.QUID -> currentUserData.balances.quid
+            }
+        }
+
+        fun GetChange(currency: Currency): Double {
+            return when (currency) {
+                Currency.GOLD -> currentUserData.balanceGold // gold has no spare change, so we'll go with this instead
+                Currency.DOLR -> currentUserData.spares.dolr
+                Currency.PENY -> currentUserData.spares.peny
+                Currency.SHIL -> currentUserData.spares.shil
+                Currency.QUID -> currentUserData.spares.quid
+            }
+        }
+
+        // How many coins of each type (except GOLD) can be held at any one time.
+        fun GetWalletSize(): Double =
+                if (currentUserData.team == Team.EleventhEchelon)
+                    Experience.GetLevelE11(currentUserData.experience).walletSize.toDouble()
+                else Experience.GetLevelCD(currentUserData.experience).walletSize.toDouble()
+
+
+        fun GetDailyDepositsLeft(): Int {
             return currentUserData.dailyDepositsLeft
         }
 
-        public fun GetBuyPrice(currency: Currency): Double {
-            return 69.0
+        fun GetDailyDepositLimit(): Int {
+            return 25
         }
 
-        public fun GetSellPrice(currency: Currency): Double {
-            return 69.0
+        // The rates of currencies to gold, as per the map file, without any "bank penalties".
+        fun GetPureRate(currency: Currency): Double {
+            return when (currency) {
+                Currency.GOLD -> 1.0 // this should never be triggered anyway
+                Currency.DOLR -> dailyPureRates.dolr
+                Currency.PENY -> dailyPureRates.peny
+                Currency.SHIL -> dailyPureRates.shil
+                Currency.QUID -> dailyPureRates.quid
+            }
         }
+
+        fun GetBankCommissionRate(): Double =
+            if (currentUserData.team == Team.EleventhEchelon)
+                Experience.GetLevelE11(currentUserData.experience).bankCommissionPercent
+            else 4.5
+
+
+        // Buying currency is more expensive; selling currency is cheaper, i.e. always done at worse prices.
+        fun GetBuyPrice(currency: Currency): Double {
+            return GetPureRate(currency) * 1 + (GetBankCommissionRate() / 100.0)
+        }
+
+        fun GetSellPrice(currency: Currency): Double {
+            return GetPureRate(currency) * 1 - (GetBankCommissionRate() / 100.0)
+        }
+
     }
 
 

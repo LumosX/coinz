@@ -2,6 +2,7 @@ package eu.zerovector.coinz.Activities
 
 import android.content.Context
 import android.os.Bundle
+import android.view.MotionEvent
 import android.widget.Toast
 import com.google.firebase.auth.FirebaseAuth
 import com.mapbox.android.core.permissions.PermissionsListener
@@ -10,6 +11,9 @@ import com.ogaclejapan.smarttablayout.utils.v4.FragmentPagerItemAdapter
 import com.ogaclejapan.smarttablayout.utils.v4.FragmentPagerItems
 import eu.zerovector.coinz.Activities.Fragments.*
 import eu.zerovector.coinz.BuildConfig
+import eu.zerovector.coinz.Data.DataManager.Companion.DOESNT_EXIST
+import eu.zerovector.coinz.Data.DataManager.Companion.PREFS_NAME
+import eu.zerovector.coinz.Data.DataManager.Companion.PREF_VERSION_CODE_KEY
 import eu.zerovector.coinz.R
 import kotlinx.android.synthetic.main.activity_game.*
 
@@ -45,6 +49,9 @@ class GameActivity : BaseFullscreenActivity(), PermissionsListener {
 
         viewPager.adapter = adapter
         tabLayout.setViewPager(viewPager)
+
+        viewPager.setOnTouchListener { v, event -> (event?.action == MotionEvent.ACTION_MOVE) }
+
 
         checkFirstRun()
 
@@ -84,10 +91,6 @@ class GameActivity : BaseFullscreenActivity(), PermissionsListener {
 
     // Based on https://stackoverflow.com/a/30274315/668143
     private fun checkFirstRun() {
-
-        val PREFS_NAME = "MyPrefsFile"
-        val PREF_VERSION_CODE_KEY = "version_code"
-        val DOESNT_EXIST = -1
 
         // Get current version code
         val currentVersionCode = BuildConfig.VERSION_CODE

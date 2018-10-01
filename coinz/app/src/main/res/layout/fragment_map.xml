@@ -21,21 +21,6 @@
         tools:context=".Activities.GameActivity">
 
         <ImageView
-            android:id="@+id/imgGold"
-            android:layout_width="18dp"
-            android:layout_height="18dp"
-            android:layout_weight="1"
-            android:src="@drawable/icon_gold" />
-
-        <TextView
-            android:id="@+id/lblGold"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:text="99999"
-            android:textColor="@color/basicGrey" />
-
-        <ImageView
             android:id="@+id/imgDolr"
             android:layout_width="18dp"
             android:layout_height="18dp"

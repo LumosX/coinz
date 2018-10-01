@@ -32,6 +32,7 @@ android {
         maven {
             url "https://jitpack.io"
         }
+        jcenter()
     }
 }
 
@@ -43,7 +44,7 @@ dependencies {
     implementation 'com.android.support:design:28.0.0'
     implementation 'com.google.firebase:firebase-core:16.0.3'
     implementation 'com.google.firebase:firebase-auth:16.0.3'
-    implementation 'com.google.firebase:firebase-database:16.0.2'
+    implementation 'com.google.firebase:firebase-firestore:17.1.0'
     testImplementation 'junit:junit:4.12'
     androidTestImplementation 'com.android.support.test:runner:1.0.2'
     androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.2'
@@ -56,6 +57,13 @@ dependencies {
     implementation 'com.mapbox.mapboxsdk:mapbox-android-plugin-locationlayer:0.8.2'
 
     implementation 'com.github.wooplr:Spotlight:1.2.3'
+
+    implementation 'com.github.kittinunf.fuel:fuel-android:1.15.0'
+    implementation 'com.github.kittinunf.fuel:fuel-moshi:1.15.0'
+    implementation 'com.squareup.moshi:moshi:1.7.0'
+    implementation 'com.squareup.moshi:moshi-kotlin:1.7.0'
 }
 
 apply plugin: 'com.google.gms.google-services'
+//apply plugin: 'kotlin-kapt'
+

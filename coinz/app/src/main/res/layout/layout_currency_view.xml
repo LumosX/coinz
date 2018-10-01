@@ -54,7 +54,6 @@
                 android:background="@drawable/generic_button"
                 android:gravity="center"
                 android:text="BUY: 62.331"
-                android:textColor="@color/lightGrey"
                 android:textSize="16sp" />
 
         </LinearLayout>
@@ -85,7 +84,6 @@
                 android:background="@drawable/generic_button"
                 android:gravity="center"
                 android:text="SELL: 61.556"
-                android:textColor="@color/lightGrey"
                 android:textSize="16sp" />
         </LinearLayout>
 
@@ -115,7 +113,6 @@
                 android:background="@drawable/generic_button"
                 android:gravity="center"
                 android:text="DEPOSIT CHANGE"
-                android:textColor="@color/lightGrey"
                 android:textSize="16sp" />
         </LinearLayout>
 

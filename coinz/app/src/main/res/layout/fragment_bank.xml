@@ -41,6 +41,16 @@
         android:textColor="@color/lightGrey"
         android:textSize="16sp" />
 
+    <TextView
+        android:id="@+id/lblCommission"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:text="Current commission rate: 4%"
+        android:textAlignment="center"
+        android:textColor="@color/lightGrey"
+        android:textSize="16sp" />
+
     <View
         android:layout_width="match_parent"
         android:layout_height="1dp"

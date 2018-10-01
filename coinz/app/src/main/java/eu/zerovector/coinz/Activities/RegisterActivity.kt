@@ -8,8 +8,13 @@ import android.view.GestureDetector
 import android.view.MotionEvent
 import android.view.View
 import android.widget.Toast
+import com.google.android.gms.tasks.OnCompleteListener
+import com.google.android.gms.tasks.Task
 import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.database.*
+import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.QuerySnapshot
+import eu.zerovector.coinz.Data.AccountData
+import eu.zerovector.coinz.Data.DataManager
 import eu.zerovector.coinz.Data.Team
 import eu.zerovector.coinz.Data.bool
 import eu.zerovector.coinz.OnSwipeListener
@@ -23,9 +28,8 @@ class RegisterActivity : BaseFullscreenActivity(), View.OnTouchListener {
     private lateinit var gestureDetector: GestureDetector
 
     // Firebase stuff
-    private lateinit var userDBBranch: DatabaseReference
-    private lateinit var fbDB: FirebaseDatabase
     private lateinit var fbAuth: FirebaseAuth
+    private lateinit var firestore: FirebaseFirestore
 
     override fun onCreate(savedInstanceState: Bundle?) {
 
@@ -51,15 +55,9 @@ class RegisterActivity : BaseFullscreenActivity(), View.OnTouchListener {
         layoutTeamSelector.visibility = View.VISIBLE
         layoutRegisterDetails.visibility = View.INVISIBLE
 
-        // Fix team selector margins for the navigation bar.
-        // for some reason this screws the "layoutCD"'s position, so we're not using it
-        /*(layoutTeamSelector.layoutParams as ViewGroup.MarginLayoutParams)
-            .setMargins(0, 0, 0, getNavigationBarSize(applicationContext).y)*/
-
         // Grab firebase instances
         fbAuth = FirebaseAuth.getInstance()
-        fbDB = FirebaseDatabase.getInstance()
-        userDBBranch = fbDB.reference.child("Users")
+        firestore = FirebaseFirestore.getInstance()
 
     }
 
@@ -87,6 +85,7 @@ class RegisterActivity : BaseFullscreenActivity(), View.OnTouchListener {
         val pass = tbPassword.text.toString().trim()
         val confirmPass = tbConfirmPassword.text.toString().trim()
         val username = tbUsername.text.toString().trim()
+        val team = if (pickedTeamIsE11) Team.EleventhEchelon else Team.CrimsonDawn
 
         // Validate data.
         // username must be 3+ chars.
@@ -109,59 +108,132 @@ class RegisterActivity : BaseFullscreenActivity(), View.OnTouchListener {
         waitDialog.show()
 
         // Whilst this is up, check to see if the username is not already taken.
-        userDBBranch.orderByChild("username").equalTo(username)
-                .addListenerForSingleValueEvent(object : ValueEventListener {
-                    override fun onDataChange(snap: DataSnapshot) {
-                        // If a user with this name exists, fail
-                        if (snap.value != null) {
-                            fail("Username already exists.")
-                        // Otherwise, don't fail.
-                        } else {
-                            // Indeed, if ALL data validates, register.
-                            // Callbacks inside callbacks inside callbacks inside callbacks inside ca...
+        val usersCol = firestore.collection("Users")
+        usersCol.whereEqualTo(username, "username").get().addOnCompleteListener(object : OnCompleteListener<QuerySnapshot> {
+            override fun onComplete(task: Task<QuerySnapshot>) {
 
-                            // If the data "validates", register.
-                            fbAuth
-                                    .createUserWithEmailAndPassword(tbEmail.text.toString(), tbPassword.text.toString())
-                                    .addOnCompleteListener { task ->
-                                        // No matter the result, hide the waiting dialog box.
-                                        waitDialog.dismiss()
+                // If the username doesn't exist, attempt to register.
+                if (!task.isSuccessful) {
 
-                                        // If all's well, make a toast.
-                                        if (task.isSuccessful) {
-                                            Toast.makeText(applicationContext, "Registration successful!", Toast.LENGTH_SHORT).show()
+                    // Fail with the correct error message if it's not working.
+                    val errorMessage = task.exception?.message ?: "Username already exists."
+                    failRegistration(errorMessage)
 
-                                            // Add the user data to the database
-                                            val userBranch = userDBBranch.child(fbAuth.currentUser!!.uid)
-                                            userBranch.child("username").setValue(tbUsername.text.toString())
-                                            userBranch.child("team").setValue((if (pickedTeamIsE11) Team.EleventhEchelon else Team.CrimsonDawn))
+                } else {
+
+                    // Indeed, if ALL data validates, register.
+                    // Callbacks inside callbacks inside callbacks inside callbacks inside ca...
+                    fbAuth
+                            .createUserWithEmailAndPassword(email, pass)
+                            .addOnCompleteListener { task ->
+                                // No matter the result, hide the waiting dialog box.
+                                waitDialog.dismiss()
+
+                                // If all's well, make a toast.
+                                if (task.isSuccessful) {
+
+                                    // I'd love to move this to the DataManager, but it'd be a pain in the arse, so it's here.
+                                    // Add the new user data to the database, with modified name and team entries
+                                    val user: AccountData = AccountData(username = username, team = team)
+
+                                    val curUserDoc = firestore.collection("Users").document(fbAuth.currentUser!!.uid)
+                                    curUserDoc.set(user).addOnCompleteListener { innerTask ->
+                                        // Must use this in case of permissions issues.
+                                        if (innerTask.isSuccessful) {
+                                            Toast.makeText(applicationContext, "Registration successful! Please wait...", Toast.LENGTH_SHORT).show()
+
+                                            // "Login" locally
+                                            DataManager.SetCurrentAccountData(user)
 
                                             // Move to the new activity as well.
                                             finish()
                                             startActivity(Intent(this@RegisterActivity, GameActivity::class.java))
-
                                         } else {
-                                            fail(task.exception?.message!!)
+                                            failRegistration(innerTask.exception?.message!!)
                                         }
                                     }
-                        }
-                    }
 
-                    override fun onCancelled(p0: DatabaseError) {
-                        fail("Could not validate username. Try again later.\n${p0.message}")
-                    }
 
-                    // and because this is essentially java-like, we can hack in this cheeky function.
-                    fun fail(innerError: String) {
-                        waitDialog.dismiss()
-                        dialogBuilder = AlertDialog.Builder(this@RegisterActivity)
-                                .setMessage("Registration failed!\n$innerError")
-                                .setNeutralButton("Close", null)
-                        val failureDialog = dialogBuilder.create()
-                        failureDialog.show()
-                    }
+                                } else {
+                                    failRegistration(task.exception?.message!!)
+                                }
+                            }
 
-                })
+
+                }
+            }
+
+            // and because this is essentially java-like, we can hack this cheeky function in the listener.
+            fun failRegistration(innerError: String) {
+                waitDialog.dismiss()
+                dialogBuilder = AlertDialog.Builder(this@RegisterActivity)
+                        .setMessage("Registration failed!\n$innerError")
+                        .setNeutralButton("Close", null)
+                val failureDialog = dialogBuilder.create()
+                failureDialog.show()
+            }
+
+        })
+
+
+        /* usersDBBranch.orderByChild("username").equalTo(username)
+                 .addListenerForSingleValueEvent(object : ValueEventListener {
+                     override fun onDataChange(snap: DataSnapshot) {
+                         // If a user with this name exists, fail
+                         if (snap.value != null) {
+                             failRegistration("Username already exists.")
+                         // Otherwise, don't fail.
+                         } else {
+                             // Indeed, if ALL data validates, register.
+                             // Callbacks inside callbacks inside callbacks inside callbacks inside ca...
+
+                             // If the data "validates", register.
+                             fbAuth
+                                     .createUserWithEmailAndPassword(email, pass)
+                                     .addOnCompleteListener { task ->
+                                         // No matter the result, hide the waiting dialog box.
+                                         waitDialog.dismiss()
+
+                                         // If all's well, make a toast.
+                                         if (task.isSuccessful) {
+                                             Toast.makeText(applicationContext, "Registration successful! Please wait...", Toast.LENGTH_SHORT).show()
+
+                                             // I'd love to move this to the DataManager, but it'd be a pain in the arse, so it's here.
+                                             // Add the new user data to the database, with modified name and team entries
+                                             val user: AccountData = AccountData(username = username, team = team)
+
+                                             val curUserBranch = usersDBBranch.child(fbAuth.currentUser!!.uid)
+                                             curUserBranch.setValue(user)
+
+                                             // "Login" locally
+                                             DataManager.SetCurrentAccountData(user)
+
+                                             // Move to the new activity as well.
+                                             finish()
+                                             startActivity(Intent(this@RegisterActivity, GameActivity::class.java))
+
+                                         } else {
+                                             failRegistration(task.exception?.message!!)
+                                         }
+                                     }
+                         }
+                     }
+
+                     override fun onCancelled(p0: DatabaseError) {
+                         failRegistration("Could not validate username. Try again later.\n${p0.message}")
+                     }
+
+                     // and because this is essentially java-like, we can hack in this cheeky function.
+                     fun failRegistration(innerError: String) {
+                         waitDialog.dismiss()
+                         dialogBuilder = AlertDialog.Builder(this@RegisterActivity)
+                                 .setMessage("Registration failed!\n$innerError")
+                                 .setNeutralButton("Close", null)
+                         val failureDialog = dialogBuilder.create()
+                         failureDialog.show()
+                     }
+
+                 })*/
     }
 
 
