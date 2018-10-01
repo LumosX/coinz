@@ -27,7 +27,7 @@
         app:stl_underlineThickness="0dp" />
 
     <!--<android.support.v4.view.ViewPager-->
-    <eu.zerovector.coinz.SmartViewPager
+    <eu.zerovector.coinz.Components.SmartViewPager
         android:id="@+id/viewPager"
         android:layout_width="match_parent"
         android:layout_height="match_parent" />

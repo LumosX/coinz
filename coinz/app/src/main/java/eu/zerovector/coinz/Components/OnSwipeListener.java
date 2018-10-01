@@ -1,4 +1,4 @@
-package eu.zerovector.coinz;
+package eu.zerovector.coinz.Components;
 
 import android.view.GestureDetector;
 import android.view.MotionEvent;

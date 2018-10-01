@@ -23,13 +23,21 @@ class DataManager {
 
 
         private lateinit var currentUserData: AccountData
-        var dailyTimestamp: String = ""
-        var currentCoinsCollected: HashSet<String> = hashSetOf() // the set of all coin IDs taken today.
+        private var dailyTimestamp: String = ""
+        var currentCoinsMap: HashMap<String, Map.CoinInfo> = hashMapOf() // the set of all coin IDs taken today.
         var dailyPureRates: Map.Rates = Map.Rates(1.0, 1.0, 1.0, 1.0)
+
+        var coinSetDirty: bool = false
+        var coinSetUpdateListener: (() -> Unit)? = null
+
 
         fun SetCurrentAccountData(userData: AccountData) {
             currentUserData = userData
         }
+
+
+
+
 
         fun UpdateLocalMap(context: Context) {
             // Get current date, then compose json file URL address.
@@ -58,7 +66,7 @@ class DataManager {
 
                         // And just like magic, this ACTUALLY WORKS
                         val mapData = moshi.adapter(Map.Data::class.java).fromJson(dataJson)
-                        ProcessMapData(mapData!!)
+                        ProcessMapData(mapData!!, context)
 
                     }
                 }
@@ -68,25 +76,55 @@ class DataManager {
         }
 
         // This method processes the map data recovered from the geoJSON file and takes care of any Firebase updates necessary.
-        fun ProcessMapData(data: Map.Data) {
+        fun ProcessMapData(data: Map.Data, context: Context) {
             // First, do the easy stuff and update the "pure" buy/sell rates for the day. We don't need to keep those in the DB.
             dailyPureRates = data.rates
-
+            // Also grab the timestamp. We need it.
+            dailyTimestamp = data.dateGenerated
 
             // MAP DATA WORKFLOW:
             // Every user "document" in the Firebase "users" collection will keep a subcollection called "Coins".
             // This subcollection will consist of documents, each ID'd with the current daily timestamp.
             // Every field in this document will be the ID of a taken coin. If a coin's in there, it's been taken already.
 
-            val allCoinsMap = hashMapOf<String, Map.CoinInfo>()
-            for (coin in data.features) {
-                val info = Map.CoinInfo(
-                        Currency.valueOf(coin.properties.currency),
-                        coin.properties.value,
-                        coin.geometry.coordinates[0],
-                        coin.geometry.coordinates[1]
-                )
-                allCoinsMap[coin.properties.id] = info
+            // First, get current coin situations from the Firebase.
+            // If the login is successful, we update local data.
+            val firestore = FirebaseFirestore.getInstance()
+            val fbAuth = FirebaseAuth.getInstance()
+            val usersCol = firestore.collection("Users")
+            val coinDoc = usersCol
+                    .document(fbAuth.currentUser!!.uid)
+                    .collection("coins")
+                    .document(dailyTimestamp)
+
+            // Well, we need to get it from Firebase first:
+            coinDoc.get().addOnCompleteListener { task ->
+                if (!task.isSuccessful) {
+                    MakeToast(context, "Could not retrieve coin data.\n${task.exception?.message}")
+                } else {
+                    val coinsTaken = task.result.toObject(Array<String>::class.java) ?: arrayOf()
+
+                    currentCoinsMap.clear()
+                    for (coin in data.features) {
+                        val coinID = coin.properties.id
+                        // Skip any coins already taken
+                        if (coinsTaken.contains(coinID)) continue
+
+                        // Add all others to map
+                        val info = Map.CoinInfo(
+                                Currency.valueOf(coin.properties.currency),
+                                coin.properties.value,
+                                coin.geometry.coordinates[0],
+                                coin.geometry.coordinates[1]
+                        )
+                        currentCoinsMap[coinID] = info
+
+                        // Notify the map (whether or not it's listening) that it needs to refresh itself.
+                        coinSetDirty = true
+                        coinSetUpdateListener?.invoke() // this really does work
+                    }
+
+                }
             }
 
         }

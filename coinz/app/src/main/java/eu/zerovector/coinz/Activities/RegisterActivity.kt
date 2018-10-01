@@ -13,11 +13,11 @@ import com.google.android.gms.tasks.Task
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.QuerySnapshot
+import eu.zerovector.coinz.Components.OnSwipeListener
 import eu.zerovector.coinz.Data.AccountData
 import eu.zerovector.coinz.Data.DataManager
 import eu.zerovector.coinz.Data.Team
 import eu.zerovector.coinz.Data.bool
-import eu.zerovector.coinz.OnSwipeListener
 import eu.zerovector.coinz.R
 import kotlinx.android.synthetic.main.activity_register.*
 

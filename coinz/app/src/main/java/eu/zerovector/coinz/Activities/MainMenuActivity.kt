@@ -31,10 +31,6 @@ class MainMenuActivity : BaseFullscreenActivity() {
         layoutMainMenu.visibility = View.INVISIBLE
         layoutSplash.visibility = View.VISIBLE
 
-
-
-        // Immediately start downloading map data if necessary.
-        DataManager.UpdateLocalMap(baseContext)
     }
 
     // Hide splash and display main menu instead

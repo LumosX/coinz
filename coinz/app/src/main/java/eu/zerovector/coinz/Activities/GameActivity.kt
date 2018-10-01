@@ -11,6 +11,7 @@ import com.ogaclejapan.smarttablayout.utils.v4.FragmentPagerItemAdapter
 import com.ogaclejapan.smarttablayout.utils.v4.FragmentPagerItems
 import eu.zerovector.coinz.Activities.Fragments.*
 import eu.zerovector.coinz.BuildConfig
+import eu.zerovector.coinz.Data.DataManager
 import eu.zerovector.coinz.Data.DataManager.Companion.DOESNT_EXIST
 import eu.zerovector.coinz.Data.DataManager.Companion.PREFS_NAME
 import eu.zerovector.coinz.Data.DataManager.Companion.PREF_VERSION_CODE_KEY
@@ -57,6 +58,9 @@ class GameActivity : BaseFullscreenActivity(), PermissionsListener {
 
         // Also request map permissions RIGHT NOW
         checkRequestLocPermissions()
+
+        // Immediately start downloading map data.
+        DataManager.UpdateLocalMap(baseContext)
 
     }
 
