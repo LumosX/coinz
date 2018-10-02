@@ -15,10 +15,7 @@ import com.mapbox.android.core.location.LocationEngineListener
 import com.mapbox.android.core.location.LocationEnginePriority
 import com.mapbox.android.core.location.LocationEngineProvider
 import com.mapbox.mapboxsdk.Mapbox
-import com.mapbox.mapboxsdk.annotations.Icon
-import com.mapbox.mapboxsdk.annotations.Marker
-import com.mapbox.mapboxsdk.annotations.MarkerOptions
-import com.mapbox.mapboxsdk.annotations.PolygonOptions
+import com.mapbox.mapboxsdk.annotations.*
 import com.mapbox.mapboxsdk.geometry.LatLng
 import com.mapbox.mapboxsdk.geometry.LatLngBounds
 import com.mapbox.mapboxsdk.maps.MapView
@@ -31,8 +28,8 @@ import com.mapbox.mapboxsdk.style.layers.PropertyFactory.*
 import com.mapbox.mapboxsdk.style.sources.GeoJsonSource
 import eu.zerovector.coinz.Data.Currency
 import eu.zerovector.coinz.Data.DataManager
+import eu.zerovector.coinz.Extras.Companion.DrawRadiusPolygon
 import eu.zerovector.coinz.Extras.Companion.GenerateCoinIcon
-import eu.zerovector.coinz.Extras.Companion.GetPerimeterFeature
 import eu.zerovector.coinz.Extras.Companion.toString
 import eu.zerovector.coinz.R
 
@@ -43,7 +40,7 @@ class MapFragment : Fragment(), OnMapReadyCallback, LocationEngineListener {
     private lateinit var mapView: MapView
     private lateinit var mapboxMap: MapboxMap
     private var locationEngine: LocationEngine? = null
-    private lateinit var grabRadiusMarker: Marker
+    private var grabRadiusPoly: Polygon? = null
     private var coinMarkers: MutableList<Marker> = mutableListOf()
 
     private lateinit var lblDolr: TextView
@@ -86,11 +83,10 @@ class MapFragment : Fragment(), OnMapReadyCallback, LocationEngineListener {
 
 
         // Generate icons for the four currencies
-        val iconColour = ContextCompat.getColor(context!!, R.color.DarkGoldenrod)
-        iconDolr = GenerateCoinIcon(context!!, R.drawable.icon_dolr, iconColour)
-        iconPeny = GenerateCoinIcon(context!!, R.drawable.icon_peny, iconColour)
-        iconShil = GenerateCoinIcon(context!!, R.drawable.icon_shil, iconColour)
-        iconQuid = GenerateCoinIcon(context!!, R.drawable.icon_quid, iconColour)
+        iconDolr = GenerateCoinIcon(context!!, R.drawable.icon_dolr, ContextCompat.getColor(context!!, R.color.Goldenrod))
+        iconPeny = GenerateCoinIcon(context!!, R.drawable.icon_peny, ContextCompat.getColor(context!!, R.color.SandyBrown))
+        iconShil = GenerateCoinIcon(context!!, R.drawable.icon_shil, ContextCompat.getColor(context!!, R.color.Peru))
+        iconQuid = GenerateCoinIcon(context!!, R.drawable.icon_quid, ContextCompat.getColor(context!!, R.color.Chocolate))
 
 
 
@@ -117,8 +113,8 @@ class MapFragment : Fragment(), OnMapReadyCallback, LocationEngineListener {
         mapboxMap.setMinZoomPreference(14.5)
 
         // And finally, add all the markers we need on the map. In addition, register for map updates with the data manager
-        UpdateMarkers()
-        DataManager.coinSetUpdateListener = ::UpdateMarkers
+        UpdateMarkerVisuals()
+        DataManager.coinSetUpdateListener = ::UpdateMarkerVisuals
 
 
         // Add circle:
@@ -143,7 +139,8 @@ class MapFragment : Fragment(), OnMapReadyCallback, LocationEngineListener {
     }
 
     // This function is the one which actually updates all the markers.
-    private fun UpdateMarkers() {
+    // Note that grabbing the coins happens
+    private fun UpdateMarkerVisuals() {
         if (!DataManager.coinSetDirty) return
 
         // If the set of coin markers needs updating, do it
@@ -156,7 +153,7 @@ class MapFragment : Fragment(), OnMapReadyCallback, LocationEngineListener {
             val icon = CurrencyToIcon(currency)
 
             val markerOptions = MarkerOptions()
-                    .position(LatLng(coin.value.latitude, coin.value.longitude))
+                    .position(coin.value.coords)
                     .setTitle("$currency ${coin.value.value}")
                     .setIcon(icon)
 
@@ -182,9 +179,17 @@ class MapFragment : Fragment(), OnMapReadyCallback, LocationEngineListener {
                 .add(largerBounds.southEast)
                 .add(largerBounds.southWest)
                 .addHole(mutableListOf(bounds.northWest, bounds.northEast, bounds.southEast, bounds.southWest))
-        boundsPolygon.alpha(0.5f)
+        boundsPolygon.alpha(0.10f)
         boundsPolygon.fillColor(Color.RED)
         mapboxMap.addPolygon(boundsPolygon)
+
+        // The giant red box didn't look very good, so I made it very faint (10% opacity), and added a noticeable "border line" as well.
+        val boundsLine = PolylineOptions()
+                .addAll(listOf(bounds.northWest, bounds.northEast, bounds.southEast, bounds.southWest, bounds.northWest))
+        boundsLine.alpha(0.85f)
+        boundsLine.color(Color.RED)
+        boundsLine.width(4f)
+        mapboxMap.addPolyline(boundsLine)
     }
 
 
@@ -209,13 +214,40 @@ class MapFragment : Fragment(), OnMapReadyCallback, LocationEngineListener {
         locationEngine?.requestLocationUpdates()
     }
 
+
+
+
+    // The main attraction: grabbing coins within range.
     override fun onLocationChanged(location: Location?) {
         if (location == null) return
 
-        var radiusFeature = GetPerimeterFeature(location, 0.100)
-        mapboxMap.addPolygon(radiusFeature)
+        val grabRadius = DataManager.GetGrabRadiusInMetres()
+        val curLatLng = LatLng(location)
+
+        // Remove old radius circle and add new one
+        if (grabRadiusPoly != null) mapboxMap.removePolygon(grabRadiusPoly!!) // Lint only knows that some things can't be null half the time...
+        grabRadiusPoly = mapboxMap.addPolygon(DrawRadiusPolygon(location, grabRadius / 1000.0))
+
+        // Get the set of current coins.
+        val coinsToGrab = hashSetOf<String>()
+        val coinMap = DataManager.currentCoinsMap
+        for (coin in coinMap) {
+            // If the coin is outside our radius, ignore it.
+            if (coin.value.coords.distanceTo(curLatLng) > grabRadius) continue
+
+            // If it is, however, we need to grab it... IFF our wallet isn't full.
+            if (DataManager.GetChange(coin.value.currency) == DataManager.GetWalletSize()) continue
+
+            coinsToGrab.add(coin.key)
+        }
+
+        // if we grabbed any coins, notify the data manager.
+        if (!coinsToGrab.isEmpty()) DataManager.GrabCoins(coinsToGrab)
 
     }
+
+
+
 
 
 

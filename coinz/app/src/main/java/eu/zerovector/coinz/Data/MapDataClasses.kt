@@ -1,5 +1,6 @@
 package eu.zerovector.coinz.Data
 
+import com.mapbox.mapboxsdk.geometry.LatLng
 import com.squareup.moshi.Json
 
 
@@ -56,8 +57,7 @@ class Map {
     data class CoinInfo(
             var currency: Currency,
             var value: Double,
-            var longitude: Double,
-            var latitude: Double
+            var coords: LatLng
     )
 
     // And this one gets the special treatment of default values, because we use it as a data structure for other purposes

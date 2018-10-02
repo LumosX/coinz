@@ -80,35 +80,35 @@
                 android:textColor="@color/lightGrey"
                 android:textSize="16sp" />
 
-            <eu.zerovector.coinz.Views.CurrencyView
+            <eu.zerovector.coinz.Components.CurrencyView
                 android:id="@+id/layoutGold"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:layout_marginTop="10dp"
                 app:currency="GOLD" />
 
-            <eu.zerovector.coinz.Views.CurrencyView
+            <eu.zerovector.coinz.Components.CurrencyView
                 android:id="@+id/layoutDolr"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:layout_marginTop="10dp"
                 app:currency="DOLR" />
 
-            <eu.zerovector.coinz.Views.CurrencyView
+            <eu.zerovector.coinz.Components.CurrencyView
                 android:id="@+id/layoutPeny"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:layout_marginTop="10dp"
                 app:currency="PENY" />
 
-            <eu.zerovector.coinz.Views.CurrencyView
+            <eu.zerovector.coinz.Components.CurrencyView
                 android:id="@+id/layoutShil"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:layout_marginTop="10dp"
                 app:currency="SHIL" />
 
-            <eu.zerovector.coinz.Views.CurrencyView
+            <eu.zerovector.coinz.Components.CurrencyView
                 android:id="@+id/layoutQuid"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"

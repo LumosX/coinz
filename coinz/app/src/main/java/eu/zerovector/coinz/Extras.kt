@@ -16,7 +16,6 @@ import com.mapbox.mapboxsdk.annotations.IconFactory
 import com.mapbox.mapboxsdk.annotations.PolygonOptions
 import com.mapbox.mapboxsdk.geometry.LatLng
 import eu.zerovector.coinz.Data.bool
-import kotlin.math.pow
 
 
 
@@ -34,9 +33,13 @@ class Extras {
         fun Double.toString(numDecimals: Int): String {
             // The next line throws an InvocationTargetException for some unknown fucking reason.
             // return "%.$numDecimals".format(this)
+
             // I guess we'll have to HACK IT then:
-            val factor = 10.0.pow(numDecimals)
-            return (Math.round(this * factor) / factor).toString()
+           // val factor = 10.0.pow(numDecimals)
+           // return (Math.round(this * factor) / factor).toString()
+
+            // Actually, this seems to work:
+            return java.lang.String.format("%.${numDecimals}f", this)
         }
 
 
@@ -54,7 +57,7 @@ class Extras {
             return IconFactory.getInstance(context).fromBitmap(bitmap)
         }
 
-        fun GetPerimeterFeature(curPos: Location, radiusInKilometers: Double = .05, sides: Int = 64): PolygonOptions {
+        fun DrawRadiusPolygon(curPos: Location, radiusInKilometers: Double = .05, sides: Int = 64): PolygonOptions {
             // here, currentPosition is a class property, get your lat & long as you'd like
             val latitude = curPos.latitude
             val longitude = curPos.longitude

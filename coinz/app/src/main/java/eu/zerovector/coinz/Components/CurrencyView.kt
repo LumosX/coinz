@@ -1,4 +1,4 @@
-package eu.zerovector.coinz.Views
+package eu.zerovector.coinz.Components
 
 import android.annotation.SuppressLint
 import android.app.AlertDialog
@@ -69,7 +69,7 @@ class CurrencyView : LinearLayout {
         image.setImageResource(currency.iconID)
         lblName.text = currency.name
         lblBalance.text = "BANK: " + DataManager.GetBalance(currency).toString(2)
-        lblChange.text = "CHANGE: " + DataManager.GetChange(currency).toString(2) + "/" + DataManager.GetWalletSize()
+        lblChange.text = "CHANGE: " + DataManager.GetChange(currency).toString(2) + "/" + DataManager.GetWalletSize().toString(1)
 
         // Fancily set button visibility
         btnBuy.visibility = if (currency.showBuySell) View.VISIBLE else View.INVISIBLE
@@ -228,21 +228,23 @@ class CurrencyView : LinearLayout {
 
     // DEPOSITING: moving spares into balances
     fun OnDepositClicked() {
-        val sparesLeft = DataManager.GetChange(currency).toInt()
+        val sparesLeft = DataManager.GetChange(currency)
         val remainingQuota = DataManager.GetDailyDepositsLeft()
 
+        // Again, we do the conversion trick to facilitate the seekbar working with "pennies"
+        val sparesTimes100 = (sparesLeft * 100).toInt()
+        val quotaTimes100 = (remainingQuota * 100).toInt()
 
-        if (sparesLeft == 0) {
+        if (sparesTimes100 == 0) {
             MakeToast(context, "You have no coins to deposit!")
             return
-        }
-        else if (remainingQuota == 0) {
+        } else if (quotaTimes100 <= 0) {
             MakeToast(context, "You may not deposit more coins today.")
             return
         }
 
         // The max amount of coins you can deposit is the smaller of what's in the bag and the quota left
-        val maxAmount = min(remainingQuota, sparesLeft)
+        val maxAmount = min(sparesTimes100, quotaTimes100)
 
 
         val alert = AlertDialog.Builder(context)
@@ -254,22 +256,25 @@ class CurrencyView : LinearLayout {
         linear.orientation = LinearLayout.VERTICAL
 
         val text = TextView(context)
-        text.text = "Depositing $currency 0/$maxAmount (Remaining quota: $remainingQuota)"
+        text.text = "Depositing $currency 0.01/$maxAmount (Remaining quota: $remainingQuota)"
         text.gravity = Gravity.CENTER
 
         val seek = SeekBar(context)
         seek.min = 1
         seek.max = maxAmount
         seek.keyProgressIncrement = 1
-        seek.setPadding(100, 10, 100, 10)
+        //seek.setPadding(100, 10, 100, 10)
         seek.setOnSeekBarChangeListener(object : OnSeekBarChangeListener {
             override fun onStartTrackingTouch(seekBar: SeekBar?) {}
 
             override fun onStopTrackingTouch(seekBar: SeekBar?) {}
 
             override fun onProgressChanged(seekBar: SeekBar, progress: Int, fromUser: Boolean) {
-                val potentialRemaining = remainingQuota - progress
-                text.text = "Depositing $currency $progress/${seek.max} (Remaining quota: $potentialRemaining)"
+                val curAmt = progress / 100.0
+                val maxAmt = seek.max / 100.0
+
+                val potentialRemaining = (quotaTimes100 - progress) / 100.0
+                text.text = "Depositing $currency $curAmt/$maxAmt (Remaining quota: $potentialRemaining)"
             }
         })
 
@@ -281,7 +286,7 @@ class CurrencyView : LinearLayout {
 
         alert.setPositiveButton("DEPOSIT") { _, _ ->
             // Deposit the cash.
-            DataManager.DepositCoins(currency, seek.progress)
+            DataManager.DepositCoins(currency, seek.progress / 100.0)
             MakeToast(getApplicationContext(), "Sum deposited!")
         }
 

@@ -82,8 +82,8 @@ class MainMenuActivity : BaseFullscreenActivity() {
                                 if (!task.isSuccessful) {
                                     failLogin("Login failed!\n" + task.exception?.message)
                                 } else {
-                                    val userData = task.result.toObject(AccountData::class.java)
-                                    DataManager.SetCurrentAccountData(userData!!)
+                                    val userData = task.result.toObject(AccountData::class.java) ?: AccountData()
+                                    DataManager.SetCurrentAccountData(userData)
 
                                     // Then we just need to move to the new activity.
                                     finish()
