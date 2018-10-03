@@ -160,4 +160,14 @@ class GameActivity : BaseFullscreenActivity(), PermissionsListener {
         finish() // also end activity after logging the user out.
     }
 
+    // Same thing if the activity is destroyed.
+    override fun onDestroy() {
+        if (fbAuth.currentUser != null) {
+            fbAuth.signOut()
+            Toast.makeText(applicationContext, "Logged out!", Toast.LENGTH_SHORT).show()
+        }
+
+        super.onDestroy()
+        finish()
+    }
 }

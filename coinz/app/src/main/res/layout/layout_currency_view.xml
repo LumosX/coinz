@@ -68,8 +68,10 @@
             <TextView
                 android:id="@+id/lblCurrencyBalance"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
+                android:layout_height="25dp"
                 android:layout_weight="1"
+                android:autoSizeTextType="uniform"
+                android:autoSizeMaxTextSize="16sp"
                 android:gravity="center"
                 android:text="BANK: 9999999"
                 android:textAlignment="viewStart"
@@ -97,8 +99,10 @@
             <TextView
                 android:id="@+id/lblCurrencyChange"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
+                android:layout_height="25dp"
                 android:layout_weight="1"
+                android:autoSizeTextType="uniform"
+                android:autoSizeMaxTextSize="16sp"
                 android:gravity="center"
                 android:text="CHANGE: 25/25"
                 android:textAlignment="viewStart"

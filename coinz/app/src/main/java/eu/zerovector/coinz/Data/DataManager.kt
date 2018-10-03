@@ -1,7 +1,6 @@
 package eu.zerovector.coinz.Data
 
 import android.content.Context
-import android.util.Log
 import com.github.kittinunf.fuel.httpGet
 import com.github.kittinunf.result.Result
 import com.google.firebase.auth.FirebaseAuth
@@ -39,6 +38,10 @@ class DataManager {
 
         fun SetCurrentAccountData(userData: AccountData) {
             currentUserData = userData
+        }
+
+        fun GetCurrentAccountData(): AccountData {
+            return currentUserData
         }
 
 
@@ -86,6 +89,7 @@ class DataManager {
             dailyTimestamp = data.dateGenerated
 
             // Reset daily deposit quota if the user is logging in on a new day.
+            // Technically these only update in the DB if you collect a coin or make another action. But that's okay.
             if (currentUserData.lastLoginTimestamp != dailyTimestamp) {
                 currentUserData.lastLoginTimestamp = dailyTimestamp
                 currentUserData.dailyDepositsLeft = GetDailyDepositLimit()
@@ -115,7 +119,7 @@ class DataManager {
                 } else {
                     val coinsTaken = mutableListOf<String>()
                     // Get all field names from the collection. They are actually the coin IDs we need.
-                    task.result.data!!.entries.mapTo(coinsTaken) { it.key }
+                    task.result.data?.entries?.mapTo(coinsTaken) { it.key }
 
                     currentCoinsMap.clear()
                     for (coin in data.features) {
@@ -191,7 +195,7 @@ class DataManager {
             coinDoc.set(coinsTakenMap, SetOptions.merge()) // We shouldn't need a listener.
             UpdateFirebaseData()
 
-            Log.d("AYYYYYY", "GRABBED COINS! currentMapDat")
+            //Log.d("AYYYYYY", "GRABBED COINS! currentMapDat")
         }
 
         // Deposit an amount of "spare change" into the respective bank balance and update quota.
@@ -260,7 +264,7 @@ class DataManager {
             UIListeners.add(function)
         }
 
-        private fun TriggerUIUpdates() {
+        fun TriggerUIUpdates() {
             for (listener in UIListeners) {
                 listener.invoke()
             }
@@ -271,6 +275,9 @@ class DataManager {
             return currentUserData.username
         }
 
+        fun GetTeam(): Team {
+            return currentUserData.team
+        }
 
         fun GetGrabRadiusInMetres(): Int {
             return 25

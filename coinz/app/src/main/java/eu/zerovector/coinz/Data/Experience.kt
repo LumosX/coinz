@@ -37,6 +37,11 @@ class Experience {
             }
         }
 
+        fun GetLevelName(team: Team, experience: Int): String = when (team) {
+            Team.EleventhEchelon -> GetLevelE11(experience).textForm
+            Team.CrimsonDawn -> GetLevelCD(experience).textForm
+        }
+
         fun GetLevelRankFromXP(xp: Int): Int {
             return when {
                 xp < GetMinXPForLevel(2) -> 1
@@ -54,7 +59,7 @@ class Experience {
 
         // I'm doing it this way for UI reasons; otherwise it's pretty awful
         fun GetMinXPForLevel(level: Int): Int {
-            if ((level < 1) or (level > 10)) return -1
+            if (level < 1 || level > 10) return -1
             return when (level) {
                 1 -> 0
                 2 -> 100
@@ -92,7 +97,7 @@ enum class E11Levels(val textForm: String, val bankCommissionPercent: Double, va
 }
 
 enum class CDLevels(val textForm: String, val computeDiscountPercent: Int, val walletSize: Int) {
-    Level1("Recruit", 1, 15),
+    Level1("Recruit", 1, 18),
     Level2("Grunt", 3, 18),
     Level3("Enforcer", 3, 20),
     Level4("Veteran", 5, 20),

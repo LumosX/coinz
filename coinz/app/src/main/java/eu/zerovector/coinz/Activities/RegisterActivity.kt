@@ -31,6 +31,7 @@ class RegisterActivity : BaseFullscreenActivity(), View.OnTouchListener {
     private lateinit var fbAuth: FirebaseAuth
     private lateinit var firestore: FirebaseFirestore
 
+
     override fun onCreate(savedInstanceState: Bundle?) {
 
         super.onCreate(savedInstanceState)
@@ -109,11 +110,13 @@ class RegisterActivity : BaseFullscreenActivity(), View.OnTouchListener {
 
         // Whilst this is up, check to see if the username is not already taken.
         val usersCol = firestore.collection("Users")
-        usersCol.whereEqualTo(username, "username").get().addOnCompleteListener(object : OnCompleteListener<QuerySnapshot> {
+        usersCol.whereEqualTo("username", username)
+                .get()
+                .addOnCompleteListener(object : OnCompleteListener<QuerySnapshot> {
             override fun onComplete(task: Task<QuerySnapshot>) {
 
-                // If the username doesn't exist, attempt to register.
-                if (!task.isSuccessful) {
+                // If the username exists, throw an error. Otherwise, attempt to register.
+                if (!task.isSuccessful || task.result.documents.size > 0) {
 
                     // Fail with the correct error message if it's not working.
                     val errorMessage = task.exception?.message ?: "Username already exists."
@@ -140,7 +143,7 @@ class RegisterActivity : BaseFullscreenActivity(), View.OnTouchListener {
                                     curUserDoc.set(user).addOnCompleteListener { innerTask ->
                                         // Must use this in case of permissions issues.
                                         if (innerTask.isSuccessful) {
-                                            Toast.makeText(applicationContext, "Registration successful! Please wait...", Toast.LENGTH_SHORT).show()
+                                            Toast.makeText(applicationContext, "Registration successful! Loading game...", Toast.LENGTH_SHORT).show()
 
                                             // "Login" locally
                                             DataManager.SetCurrentAccountData(user)

@@ -28,6 +28,7 @@ import com.mapbox.mapboxsdk.style.layers.PropertyFactory.*
 import com.mapbox.mapboxsdk.style.sources.GeoJsonSource
 import eu.zerovector.coinz.Data.Currency
 import eu.zerovector.coinz.Data.DataManager
+import eu.zerovector.coinz.Data.bool
 import eu.zerovector.coinz.Extras.Companion.DrawRadiusPolygon
 import eu.zerovector.coinz.Extras.Companion.GenerateCoinIcon
 import eu.zerovector.coinz.Extras.Companion.toString
@@ -101,9 +102,6 @@ class MapFragment : Fragment(), OnMapReadyCallback, LocationEngineListener {
     override fun onMapReady(mapboxMap: MapboxMap) {
         this.mapboxMap = mapboxMap
 
-        // TODO: add circle for grabbing radius
-
-
         // Permissions are handled elsewhere and should be available
         enableLocationEvents()
 
@@ -113,8 +111,8 @@ class MapFragment : Fragment(), OnMapReadyCallback, LocationEngineListener {
         mapboxMap.setMinZoomPreference(14.5)
 
         // And finally, add all the markers we need on the map. In addition, register for map updates with the data manager
-        UpdateMarkerVisuals()
-        DataManager.coinSetUpdateListener = ::UpdateMarkerVisuals
+        UpdateMarkerVisuals(true)
+        DataManager.coinSetUpdateListener = { UpdateMarkerVisuals(false) }
 
 
         // Add circle:
@@ -140,8 +138,8 @@ class MapFragment : Fragment(), OnMapReadyCallback, LocationEngineListener {
 
     // This function is the one which actually updates all the markers.
     // Note that grabbing the coins happens
-    private fun UpdateMarkerVisuals() {
-        if (!DataManager.coinSetDirty) return
+    private fun UpdateMarkerVisuals(forceUpdate: bool) {
+        if (!forceUpdate and !DataManager.coinSetDirty) return
 
         // If the set of coin markers needs updating, do it
         for (marker in coinMarkers) marker.remove()
@@ -196,6 +194,7 @@ class MapFragment : Fragment(), OnMapReadyCallback, LocationEngineListener {
     private fun enableLocationEvents() {
         // Get the LocationEngine running first.
         locationEngine = LocationEngineProvider(context).obtainBestLocationEngineAvailable()
+        // TODO: WORK AROUND MAPBOX BUG https://github.com/mapbox/mapbox-navigation-android/issues/1121
         locationEngine?.priority = LocationEnginePriority.HIGH_ACCURACY
         locationEngine?.fastestInterval = 1000
         locationEngine?.addLocationEngineListener(this)
@@ -213,8 +212,6 @@ class MapFragment : Fragment(), OnMapReadyCallback, LocationEngineListener {
     override fun onConnected() {
         locationEngine?.requestLocationUpdates()
     }
-
-
 
 
     // The main attraction: grabbing coins within range.
@@ -253,10 +250,10 @@ class MapFragment : Fragment(), OnMapReadyCallback, LocationEngineListener {
 
     @SuppressLint("SetTextI18n")
     private fun UpdateCoinLabels() {
-        lblDolr.text = DataManager.GetChange(Currency.DOLR).toString(2) + "/" + DataManager.GetWalletSize()
-        lblPeny.text = DataManager.GetChange(Currency.PENY).toString(2) + "/" + DataManager.GetWalletSize()
-        lblShil.text = DataManager.GetChange(Currency.SHIL).toString(2) + "/" + DataManager.GetWalletSize()
-        lblQuid.text = DataManager.GetChange(Currency.QUID).toString(2) + "/" + DataManager.GetWalletSize()
+        lblDolr.text = DataManager.GetChange(Currency.DOLR).toString(2) + "/" + DataManager.GetWalletSize().toString(0)
+        lblPeny.text = DataManager.GetChange(Currency.PENY).toString(2) + "/" + DataManager.GetWalletSize().toString(0)
+        lblShil.text = DataManager.GetChange(Currency.SHIL).toString(2) + "/" + DataManager.GetWalletSize().toString(0)
+        lblQuid.text = DataManager.GetChange(Currency.QUID).toString(2) + "/" + DataManager.GetWalletSize().toString(0)
     }
 
 
