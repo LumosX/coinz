@@ -1,15 +1,295 @@
 <?xml version="1.0" encoding="utf-8"?>
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".Activities.Fragments.StatsFragment">
+    android:background="@color/Black"
+    android:orientation="vertical"
+    tools:context=".Activities.Fragments.StatsFragment"
+    tools:ignore="HardcodedText">
 
-    <!-- TODO: Update blank fragment layout -->
-    <TextView
+    <ImageView
+        android:id="@+id/imgIconCD"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:textColor="@color/lightGrey"
-        android:text="@string/hello_blank_fragment" />
+        android:alpha="0.45"
+        android:scaleType="fitCenter"
+        android:src="@drawable/icon_cd"
+        android:tint="@color/Crimson"
+        tools:ignore="ContentDescription" />
 
+    <ImageView
+        android:id="@+id/imgIconE11"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_marginStart="-60dp"
+        android:layout_marginEnd="-60dp"
+        android:alpha="0.45"
+        android:scaleType="fitCenter"
+        android:src="@drawable/icon_e11"
+        android:tint="@color/Silver"
+        tools:ignore="ContentDescription" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical">
+
+        <Space
+            android:layout_width="match_parent"
+            android:layout_height="4dp" />
+
+        <TextView
+            android:id="@+id/lblNameFaction"
+            android:layout_width="match_parent"
+            android:layout_height="30dp"
+            android:layout_marginBottom="4dp"
+            android:autoSizeMaxTextSize="24sp"
+            android:autoSizeTextType="uniform"
+            android:text="USERNAME, CRIMSON DAWN"
+            android:textAlignment="center"
+            android:textColor="@color/lightGrey"
+            android:textSize="24sp" />
+
+        <TextView
+            android:id="@+id/lblCurrentLevel"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="10dp"
+            android:layout_marginStart="10dp"
+            android:text="LEVEL 10 | OPERATIONS COMMANDER"
+            android:textAlignment="viewStart"
+            android:textColor="@color/lightGrey"
+            android:textSize="16sp" />
+
+        <ProgressBar
+            android:id="@+id/pbExperience"
+            style="@android:style/Widget.ProgressBar.Horizontal"
+            android:layout_width="match_parent"
+            android:layout_height="4dp"
+            android:layout_marginEnd="10dp"
+            android:layout_marginStart="10dp"
+            android:progress="50"
+            android:progressDrawable="@drawable/progressbar_e11" />
+
+        <TextView
+            android:id="@+id/lblXP"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="10dp"
+            android:layout_marginStart="10dp"
+            android:text="10000/10000"
+            android:textAlignment="viewEnd"
+            android:textColor="@color/darkGrey"
+            android:textSize="16sp" />
+
+        <Space
+            android:layout_width="match_parent"
+            android:layout_height="4dp" />
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:layout_marginBottom="4dp"
+            android:layout_marginEnd="10dp"
+            android:layout_marginStart="10dp"
+            android:layout_marginTop="4dp"
+            android:background="@color/darkGrey" />
+
+        <ScrollView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="4dp"
+                android:layout_marginStart="4dp"
+                android:orientation="vertical">
+
+                <TextView
+                    android:id="@+id/lblInterbank"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="4dp"
+                    android:gravity="center"
+                    android:text="DAILY INTERBANK RATES:\n(without commission)"
+                    android:textAlignment="center"
+                    android:textColor="@color/lightGrey"
+                    android:textSize="16sp" />
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal">
+
+                    <TextView
+                        android:id="@+id/lblGoldDolr"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="4dp"
+                        android:layout_weight="1"
+                        android:gravity="center"
+                        android:text="GOLD/DOLR 43.5544"
+                        android:textAlignment="center"
+                        android:textColor="@color/lightGrey"
+                        android:textSize="16sp" />
+
+                    <TextView
+                        android:id="@+id/lblGoldPeny"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="4dp"
+                        android:layout_weight="1"
+                        android:gravity="center"
+                        android:text="GOLD/PENY 43.5544"
+                        android:textAlignment="center"
+                        android:textColor="@color/lightGrey"
+                        android:textSize="16sp" />
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal">
+
+                    <TextView
+                        android:id="@+id/lblGoldShil"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="4dp"
+                        android:layout_weight="1"
+                        android:gravity="center"
+                        android:text="GOLD/SHIL 43.5544"
+                        android:textAlignment="center"
+                        android:textColor="@color/lightGrey"
+                        android:textSize="16sp" />
+
+                    <TextView
+                        android:id="@+id/lblGoldQuid"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="4dp"
+                        android:layout_weight="1"
+                        android:gravity="center"
+                        android:text="GOLD/QUID 43.5544"
+                        android:textAlignment="center"
+                        android:textColor="@color/lightGrey"
+                        android:textSize="16sp" />
+                </LinearLayout>
+
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:layout_marginBottom="4dp"
+                    android:layout_marginEnd="6dp"
+                    android:layout_marginStart="6dp"
+                    android:layout_marginTop="10dp"
+                    android:background="@color/darkGrey" />
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginEnd="4dp"
+                    android:layout_marginStart="4dp"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:id="@+id/lblTeamBenefits"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="4dp"
+                        android:gravity="center"
+                        android:text="TEAM BENEFITS:"
+                        android:textAlignment="center"
+                        android:textColor="@color/lightGrey"
+                        android:textSize="16sp" />
+
+                    <TextView
+                        android:id="@+id/lblBenefit1"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="4dp"
+                        android:gravity="center"
+                        android:text="Compute discount:"
+                        android:textAlignment="center"
+                        android:textColor="@color/lightGrey"
+                        android:textSize="16sp" />
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal">
+
+                        <TextView
+                            android:id="@+id/lblBenefit1CurLevel"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="4dp"
+                            android:layout_weight="1"
+                            android:gravity="center"
+                            android:text="Current level: 3%"
+                            android:textAlignment="center"
+                            android:textColor="@color/lightGrey"
+                            android:textSize="16sp" />
+
+                        <TextView
+                            android:id="@+id/lblBenefit1NextLevel"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="4dp"
+                            android:layout_weight="1"
+                            android:gravity="center"
+                            android:text="(Next level: 5%)"
+                            android:textAlignment="center"
+                            android:textColor="@color/basicGrey"
+                            android:textSize="16sp" />
+                    </LinearLayout>
+
+                    <TextView
+                        android:id="@+id/lblBenefit2"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="4dp"
+                        android:gravity="center"
+                        android:text="Wallet size:"
+                        android:textAlignment="center"
+                        android:textColor="@color/lightGrey"
+                        android:textSize="16sp" />
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal">
+
+                        <TextView
+                            android:id="@+id/lblBenefit2CurLevel"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="4dp"
+                            android:layout_weight="1"
+                            android:gravity="center"
+                            android:text="Current level: 18"
+                            android:textAlignment="center"
+                            android:textColor="@color/lightGrey"
+                            android:textSize="16sp" />
+
+                        <TextView
+                            android:id="@+id/lblBenefit2NextLevel"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="4dp"
+                            android:layout_weight="1"
+                            android:gravity="center"
+                            android:text="(Next level: 20)"
+                            android:textAlignment="center"
+                            android:textColor="@color/basicGrey"
+                            android:textSize="16sp" />
+                    </LinearLayout>
+                </LinearLayout>
+
+            </LinearLayout>
+        </ScrollView>
+    </LinearLayout>
 </FrameLayout>

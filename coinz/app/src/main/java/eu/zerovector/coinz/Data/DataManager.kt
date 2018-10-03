@@ -171,6 +171,8 @@ class DataManager {
                     Currency.SHIL -> currentUserData.spares.shil = min(amount + currentUserData.spares.shil, walletSize)
                     Currency.QUID -> currentUserData.spares.quid = min(amount + currentUserData.spares.quid, walletSize)
                 }
+                // Remember to give some XP for collecting coins.
+                currentUserData.experience += coin.value.value.toInt() // the amount of the coin, rounded down.
 
                 // Firestore doesn't want to use lists, so we need to make ANOTHER map instead.
                 coinsTakenMap[coin.key] = true // just set a bool for no reason
@@ -277,6 +279,10 @@ class DataManager {
 
         fun GetTeam(): Team {
             return currentUserData.team
+        }
+
+        fun GetXP(): Int {
+            return currentUserData.experience
         }
 
         fun GetGrabRadiusInMetres(): Int {

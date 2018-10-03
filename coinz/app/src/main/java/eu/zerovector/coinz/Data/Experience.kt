@@ -74,6 +74,35 @@ class Experience {
             }
         }
 
+
+
+        // This function packs up all the values and benefits for a given level and team.
+
+        fun GetTeamBenefitData(team: Team, experience: Int): List<String> {
+            if (team == Team.EleventhEchelon) {
+                val curLevel = GetLevelE11(experience)
+                val isMaxLevel = curLevel == E11Levels.Level10
+                val nextLevel = if (isMaxLevel) curLevel else E11Levels.values()[curLevel.ordinal + 1]
+
+                val nextLevel1 = if (isMaxLevel) "--" else "${nextLevel.bankCommissionPercent}%"
+                val nextLevel2 = if (isMaxLevel) "--" else "${nextLevel.walletSize}"
+
+                return listOf("Lower bank commission:", "${curLevel.bankCommissionPercent}%", nextLevel1,
+                              "Wallet size:", "${curLevel.walletSize}", nextLevel2)
+            }
+            else {
+                val curLevel = GetLevelCD(experience)
+                val isMaxLevel = curLevel == CDLevels.Level10
+                val nextLevel = if (isMaxLevel) curLevel else CDLevels.values()[curLevel.ordinal + 1]
+
+                val nextLevel1 = if (isMaxLevel) "--" else "${nextLevel.computeDiscountPercent}%"
+                val nextLevel2 = if (isMaxLevel) "--" else "${nextLevel.walletSize}"
+
+                return listOf("Compute discount:", "${curLevel.computeDiscountPercent}%", nextLevel1,
+                        "Wallet size:", "${curLevel.walletSize}", nextLevel2)
+            }
+        }
+
     }
 
 }

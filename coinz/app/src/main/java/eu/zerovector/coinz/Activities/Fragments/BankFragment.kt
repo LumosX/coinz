@@ -103,6 +103,7 @@ class BankFragment : Fragment() {
         if (shil >= 1) availableChoices.add("SHIL (max: ${shil.toString(2)})")
         if (quid >= 1) availableChoices.add("QUID (max: ${quid.toString(2)})")
         menu.adapter = ArrayAdapter<String>(context!!, android.R.layout.simple_spinner_dropdown_item, availableChoices)
+
         linear.addView(menu)
 
         val tbAmount = EditText(context)
@@ -144,12 +145,24 @@ class BankFragment : Fragment() {
                                 else -> Currency.GOLD // impossible, but still
                             }
                     val amtToGold = (amt * DataManager.GetSellPrice(selectedCurrency) * 100).toInt() / 100.0
-                    text.text = "Will send $selectedCurrency $amtToGold"
+                    text.text = "Will send GOLD $amtToGold"
                 }
 
 
             }
         })
+
+        // And also handle what happens when the menu selection changes.
+        menu.onItemSelectedListener = object: AdapterView.OnItemSelectedListener {
+            override fun onNothingSelected(parent: AdapterView<*>?) {
+                tbAmount.text.clear()
+            }
+
+            override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
+                tbAmount.text.clear()
+            }
+
+        }
 
 
 
