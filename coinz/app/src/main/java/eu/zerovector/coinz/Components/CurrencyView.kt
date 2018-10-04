@@ -68,9 +68,9 @@ class CurrencyView : LinearLayout {
         // Set variables based on the current currency
         image.setImageResource(currency.iconID)
         lblName.text = currency.name
-        lblBalance.text = "BANK: " + DataManager.GetBalance(currency).toString(2)
-        lblChange.text = "CHANGE: " + DataManager.GetChange(currency).toString(2) +
-                "/" + DataManager.GetWalletSize().toString(2)
+        lblBalance.text = "BANK: " + DataManager.GetBalance(currency) / 100.0
+        lblChange.text = "CHANGE: " + DataManager.GetChange(currency) / 100.0 +
+                "/" + DataManager.GetWalletSize() / 100.0
 
         // Fancily set button visibility
         btnBuy.visibility = if (currency.showBuySell) View.VISIBLE else View.INVISIBLE
@@ -97,7 +97,8 @@ class CurrencyView : LinearLayout {
         // First, find out how much of this currency we can buy.
         val maxPurchaseableAmount = curGold / curPrice
         // Then we get the amount in "pennies" and floor to int, because the seek bar works with ints.
-        val maxBuyAmountTimes100 = (maxPurchaseableAmount * 100).toInt()
+        //val maxBuyAmountTimes100 = (maxPurchaseableAmount * 100).toInt()
+        val maxBuyAmountTimes100 = maxPurchaseableAmount.toInt() // when using ints by default, we simply need to bind this.
 
         // If you can't buy a single "penny" of the currency, abort.
         if (maxBuyAmountTimes100 < 1) {
@@ -115,7 +116,7 @@ class CurrencyView : LinearLayout {
 
         val text = TextView(context)
         text.text = "Buying $currency 0.01 " +
-                "(GOLD left: ${(curGold - curPrice * 0.01).toString(2)})"
+                "(GOLD left: ${(curGold / 100.0 - curPrice * 0.01).toString(2)})"
         text.gravity = Gravity.CENTER
 
         val seek = SeekBar(context)
@@ -133,7 +134,7 @@ class CurrencyView : LinearLayout {
                 var curAmt = min(progress, maxBuyAmountTimes100) / 100.0
                 var curAmtStr = curAmt.toString(2)
 
-                var remainingGold = (curGold - curPrice * curAmt).toString(2)
+                var remainingGold = (curGold / 100.0 - curPrice * curAmt).toString(2)
 
                 text.text = "Buying $currency $curAmtStr (GOLD left: $remainingGold)"
             }
@@ -147,8 +148,8 @@ class CurrencyView : LinearLayout {
 
         alert.setPositiveButton("BUY") { _, _ ->
             // Deposit the cash.
-            var boughtCurrency = min(seek.progress, maxBuyAmountTimes100) / 100.0
-            var goldDelta = -curPrice * boughtCurrency // NEGATIVE!
+            var boughtCurrency = min(seek.progress, maxBuyAmountTimes100)
+            var goldDelta = (-curPrice * boughtCurrency).toInt() // NEGATIVE!
             DataManager.BuySellCoins(currency, boughtCurrency, goldDelta)
             MakeToast(getApplicationContext(), "Purchase complete!")
         }
@@ -166,7 +167,8 @@ class CurrencyView : LinearLayout {
 
         // First, find out how much of this currency we can sell.
         // Then we do the multiplication trick again
-        val maxSellingAmountTimes100 = (curBalance * 100).toInt()
+        //val maxSellingAmountTimes100 = (curBalance * 100).toInt()
+        val maxSellingAmountTimes100 = curBalance
 
         // Like above, If you can't sell a single "penny" of the currency, abort.
         if (maxSellingAmountTimes100 < 1) {
@@ -215,8 +217,8 @@ class CurrencyView : LinearLayout {
 
         alert.setPositiveButton("SELL") { _, _ ->
             // Deposit the cash.
-            var soldCurrency = min(seek.progress, maxSellingAmountTimes100) / 100.0
-            var goldDelta = curPrice * soldCurrency // Gold is positive this time...
+            var soldCurrency = min(seek.progress, maxSellingAmountTimes100)
+            var goldDelta = (curPrice * soldCurrency).toInt() // Gold is positive this time...
             DataManager.BuySellCoins(currency, -soldCurrency, goldDelta) // ... and the currency delta is negative
             MakeToast(getApplicationContext(), "Sale complete!")
         }
@@ -233,8 +235,8 @@ class CurrencyView : LinearLayout {
         val remainingQuota = DataManager.GetDailyDepositsLeft()
 
         // Again, we do the conversion trick to facilitate the seekbar working with "pennies"
-        val sparesTimes100 = (sparesLeft * 100).toInt()
-        val quotaTimes100 = (remainingQuota * 100).toInt()
+        val sparesTimes100 = (sparesLeft).toInt()
+        val quotaTimes100 = (remainingQuota).toInt()
 
         if (sparesTimes100 == 0) {
             MakeToast(context, "You have no coins to deposit!")
@@ -257,7 +259,7 @@ class CurrencyView : LinearLayout {
         linear.orientation = LinearLayout.VERTICAL
 
         val text = TextView(context)
-        text.text = "Depositing $currency 0.01/${maxAmount / 100.0} (Remaining quota: $remainingQuota)"
+        text.text = "Depositing $currency 0.01/${maxAmount / 100.0} (Remaining quota: ${(remainingQuota - 1) / 100.0})"
         text.gravity = Gravity.CENTER
 
         val seek = SeekBar(context)
@@ -274,7 +276,7 @@ class CurrencyView : LinearLayout {
                 val curAmt = min(progress, maxAmount) / 100.0
                 val maxAmt = maxAmount / 100.0
 
-                val potentialRemaining = ((quotaTimes100 - curAmt) / 100.0).toString(2)
+                val potentialRemaining = ((quotaTimes100 - curAmt * 100) / 100.0).toString(2)
                 text.text = "Depositing $currency $curAmt/$maxAmt (Remaining quota: $potentialRemaining)"
             }
         })
@@ -287,7 +289,7 @@ class CurrencyView : LinearLayout {
 
         alert.setPositiveButton("DEPOSIT") { _, _ ->
             // Deposit the cash.
-            DataManager.DepositCoins(currency, min(seek.progress, maxAmount) / 100.0)
+            DataManager.DepositCoins(currency, min(seek.progress, maxAmount))
             MakeToast(getApplicationContext(), "Sum deposited!")
         }
 

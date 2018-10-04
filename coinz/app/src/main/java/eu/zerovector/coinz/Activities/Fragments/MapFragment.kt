@@ -31,7 +31,6 @@ import eu.zerovector.coinz.Data.DataManager
 import eu.zerovector.coinz.Data.bool
 import eu.zerovector.coinz.Extras.Companion.DrawRadiusPolygon
 import eu.zerovector.coinz.Extras.Companion.GenerateCoinIcon
-import eu.zerovector.coinz.Extras.Companion.toString
 import eu.zerovector.coinz.R
 
 
@@ -250,10 +249,11 @@ class MapFragment : Fragment(), OnMapReadyCallback, LocationEngineListener {
 
     @SuppressLint("SetTextI18n")
     private fun UpdateCoinLabels() {
-        lblDolr.text = DataManager.GetChange(Currency.DOLR).toString(2) + "/" + DataManager.GetWalletSize().toString(0)
-        lblPeny.text = DataManager.GetChange(Currency.PENY).toString(2) + "/" + DataManager.GetWalletSize().toString(0)
-        lblShil.text = DataManager.GetChange(Currency.SHIL).toString(2) + "/" + DataManager.GetWalletSize().toString(0)
-        lblQuid.text = DataManager.GetChange(Currency.QUID).toString(2) + "/" + DataManager.GetWalletSize().toString(0)
+        val walletSize = DataManager.GetWalletSize() / 100.0
+        lblDolr.text = "${DataManager.GetChange(Currency.DOLR) / 100.0}/$walletSize"
+        lblPeny.text = "${DataManager.GetChange(Currency.PENY) / 100.0}/$walletSize"
+        lblShil.text = "${DataManager.GetChange(Currency.SHIL) / 100.0}/$walletSize"
+        lblQuid.text = "${DataManager.GetChange(Currency.QUID) / 100.0}/$walletSize"
     }
 
 

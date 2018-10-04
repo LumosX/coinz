@@ -15,11 +15,11 @@ data class AccountData (
         // Processing power, a.k.a. "compute", is the currency required to decrypt the daily messages and thus win the "war"
         var compute: Int = 0,
 
-        var dailyDepositsLeft: Double = 25.0,
+        var dailyDepositsLeft: Int = 2500,
 
         // Bank stuff
-        var balanceGold: Double = 200.0,
-        var balances: Map.Rates = Map.Rates(), // we're recycling the Map.Rates class, which holds one double per currency
+        var balanceGold: Int = 20000,
+        var balances: Map.Wallet = Map.Wallet(), // we're recycling the Map.Rates class, which holds one double per currency
         // Spares
-        var spares: Map.Rates = Map.Rates()
+        var spares: Map.Wallet = Map.Wallet()
 )

@@ -71,4 +71,17 @@ class Map {
             @Json(name = "PENY")
             var peny: Double = 0.0
     )
+
+    // And this will allow us to hold balances more easily...
+    data class Wallet(
+            @Json(name = "SHIL")
+            var shil: Int = 0,
+            @Json(name = "DOLR")
+            var dolr: Int = 0,
+            @Json(name = "QUID")
+            var quid: Int = 0,
+            @Json(name = "PENY")
+            var peny: Int = 0
+    )
+
 }

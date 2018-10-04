@@ -18,11 +18,7 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.QuerySnapshot
 import com.google.firebase.firestore.SetOptions
-import eu.zerovector.coinz.Data.AccountData
-import eu.zerovector.coinz.Data.Currency
-import eu.zerovector.coinz.Data.DataManager
-import eu.zerovector.coinz.Data.Experience.Companion.GetLevelName
-import eu.zerovector.coinz.Data.bool
+import eu.zerovector.coinz.Data.*
 import eu.zerovector.coinz.Extras.Companion.MakeToast
 import eu.zerovector.coinz.Extras.Companion.toString
 import eu.zerovector.coinz.R
@@ -58,7 +54,7 @@ class BankFragment : Fragment() {
 
     @SuppressLint("SetTextI18n")
     private fun SetQuotaText() {
-        lblQuota.text = "Daily deposit quota: " + DataManager.GetDailyDepositsLeft() + "/" + DataManager.GetDailyDepositLimit();
+        lblQuota.text = "Daily deposit quota: " + DataManager.GetDailyDepositsLeft() / 100.0 + "/" + DataManager.GetDailyDepositLimit() / 100.0
         lblCommission.text = "Current commission rate: " + DataManager.GetBankCommissionRate().toString(1) + "%"
     }
 
@@ -74,7 +70,7 @@ class BankFragment : Fragment() {
         val shil = DataManager.GetChange(Currency.SHIL)
         val quid = DataManager.GetChange(Currency.QUID)
 
-        if (dolr < 1 && peny < 1 && shil < 1 && quid < 1) {
+        if (dolr < 100 && peny < 100 && shil < 100 && quid < 100) {
             MakeToast(context!!, "Not enough change of any currency to send. Minimum amount = 1 coin.")
             return
         }
@@ -98,10 +94,10 @@ class BankFragment : Fragment() {
 
         val menu = Spinner(context)
         val availableChoices = mutableListOf<String>()
-        if (dolr >= 1) availableChoices.add("DOLR (max: ${dolr.toString(2)})")
-        if (peny >= 1) availableChoices.add("PENY (max: ${peny.toString(2)})")
-        if (shil >= 1) availableChoices.add("SHIL (max: ${shil.toString(2)})")
-        if (quid >= 1) availableChoices.add("QUID (max: ${quid.toString(2)})")
+        if (dolr >= 100) availableChoices.add("DOLR (max: ${(dolr / 100.0).toString(2)})")
+        if (peny >= 100) availableChoices.add("PENY (max: ${(peny / 100.0).toString(2)})")
+        if (shil >= 100) availableChoices.add("SHIL (max: ${(shil / 100.0).toString(2)})")
+        if (quid >= 100) availableChoices.add("QUID (max: ${(quid / 100.0).toString(2)})")
         menu.adapter = ArrayAdapter<String>(context!!, android.R.layout.simple_spinner_dropdown_item, availableChoices)
 
         linear.addView(menu)
@@ -126,10 +122,10 @@ class BankFragment : Fragment() {
         alert.setView(mainContainer)
 
         // Attach a listener to recalculate the amount of GOLD sent as input changes
-        tbAmount.addTextChangedListener(object: TextWatcher {
-            override fun afterTextChanged(s: Editable?) { }
+        tbAmount.addTextChangedListener(object : TextWatcher {
+            override fun afterTextChanged(s: Editable?) {}
 
-            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) { }
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
 
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
                 val amt = s.toString().toDoubleOrNull()
@@ -153,7 +149,7 @@ class BankFragment : Fragment() {
         })
 
         // And also handle what happens when the menu selection changes.
-        menu.onItemSelectedListener = object: AdapterView.OnItemSelectedListener {
+        menu.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
             override fun onNothingSelected(parent: AdapterView<*>?) {
                 tbAmount.text.clear()
             }
@@ -179,7 +175,7 @@ class BankFragment : Fragment() {
                         menu.selectedItem.toString().startsWith("QUID") -> Currency.QUID
                         else -> null
                     }
-            val maxCurrencyAmt = if (selectedCurrency == null) 0.0 else DataManager.GetChange(selectedCurrency)
+            val maxCurrencyAmt = if (selectedCurrency == null) 0 else DataManager.GetChange(selectedCurrency)
             val recipientName = tbRecipient.text.toString().trim()
             // Handle all the error cases in here, he-he.
             when {
@@ -205,6 +201,8 @@ class BankFragment : Fragment() {
                 }
             }
 
+            // Doing the trick again: convert the amount to an int as "pence" (x100), then truncate decimals to circumvent rounding errors.
+            val selectedAmountInt = (selectedAmount!! * 100).toInt()
 
             // If nothing bad happened, try sending the ca$h to the recipient
             // First, "lock" this functionality until the transaction is completed.
@@ -217,81 +215,88 @@ class BankFragment : Fragment() {
                     .whereEqualTo("team", DataManager.GetTeam().toString())
                     .get()
                     .addOnCompleteListener(object : OnCompleteListener<QuerySnapshot> {
-                override fun onComplete(task: Task<QuerySnapshot>) {
+                        override fun onComplete(task: Task<QuerySnapshot>) {
 
-                    // If the username doesn't exist, we can't send anything.
-                    if (!task.isSuccessful || task.result.documents.size == 0) {
-                        val errorMessage = task.exception?.message
-                                ?: "Recipient username doesn't exist or recipient not on the same team."
-                        failTransaction(errorMessage)
-                    }
-                    // Otherwise, however, DO send the cash.
-                    else {
-                        val recipientID = task.result.documents[0].id // pretty sure that this is safe, as we've already checked whether a doc exists.
-                        val curUserID = FirebaseAuth.getInstance().currentUser!!.uid
-
-                        // Decrement spare change on this account, increment gold on the recipient, and send the recipient a message.
-                        // Better to do it here than in the DataManager, because we need to "unlock" this (sendingTransactionInProgress) at the end.
-                        val batch = firestore.batch()
-
-                        // INCREMENT GOLD FOR THE RECIPIENT
-                        // all nulls are handled at this point
-                        val selectedAmtInGold = (selectedAmount!! * DataManager.GetSellPrice(selectedCurrency!!) * 100).toInt() / 100.0
-                        val recipientAccount = task.result.documents[0].toObject(AccountData::class.java)!!
-                        recipientAccount.balanceGold += selectedAmtInGold
-                        val recipientDoc = usersCol.document(recipientID)
-                        batch.set(recipientDoc, recipientAccount)
-
-
-                        // DECREMENT SPARES BALANCE FOR US
-                        val curUserData = DataManager.GetCurrentAccountData()
-                        curUserData.experience += selectedAmount.toInt() * 2 // Add some XP as well, why not.
-                        when (selectedCurrency) {
-                            Currency.GOLD -> {} // Again, this should never happen
-                            Currency.DOLR -> curUserData.spares.dolr -= selectedAmount
-                            Currency.PENY -> curUserData.spares.peny -= selectedAmount
-                            Currency.SHIL -> curUserData.spares.shil -= selectedAmount
-                            Currency.QUID -> curUserData.spares.quid -= selectedAmount
+                            // If the username doesn't exist, we can't send anything.
+                            if (!task.isSuccessful || task.result.documents.size == 0) {
+                                val errorMessage = task.exception?.message
+                                        ?: "Recipient username doesn't exist or recipient not on the same team."
+                                failTransaction(errorMessage)
+                            }
+                            // Otherwise, however, DO send the cash.
+                            else {
+                                // pretty sure that this is safe, as we've already checked whether a doc exists.
+                                makeTransaction(task.result.documents[0].id)
+                            }
                         }
-                        val curUserDoc = firestore.collection("Users").document(curUserID)
-                        batch.set(curUserDoc, curUserData)
-                        DataManager.SetCurrentAccountData(curUserData)
+
+                        // and because this is essentially java-like, we can hack this cheeky function in the listener.
+                        fun failTransaction(innerError: String) {
+                            MakeToast(context!!, innerError)
+                            sendingTransactionInProgress = false
+                        }
+
+                        // And the same applies for this one...
+                        fun makeTransaction(recipientID: String) {
+                            val curUserID = FirebaseAuth.getInstance().currentUser!!.uid
+
+                            val curUserDoc = usersCol.document(curUserID)
+                            val recipientDoc = usersCol.document(recipientID)
+                            val recipientMessageDoc = usersCol
+                                    .document(recipientID)
+                                    .collection("messages")
+                                    .document("transactions")
+
+                            // Decrement spare change on this account, increment gold on the recipient, and send the recipient a message.
+                            // Better to do it here than in the DataManager, because we need to "unlock" this (sendingTransactionInProgress) at the end.
+                            // And because we need to NOT interleave DB reads and writes, we need to use a Transaction for this one.
+                            firestore.runTransaction { transaction ->
+                                // A document must exist for both users, so I can unwrap!! the nullable type
+                                val recipientAccount = transaction.get(recipientDoc).toObject(AccountData::class.java)!!
+                                val currentAccount = transaction.get(curUserDoc).toObject(AccountData::class.java)!!
+
+                                val selectedAmtInGold = (selectedAmountInt * DataManager.GetSellPrice(selectedCurrency!!)).toInt()
+
+                                // INCREMENT GOLD FOR RECEIVER
+                                transaction.update(recipientDoc, "balanceGold", recipientAccount.balanceGold + selectedAmtInGold)
 
 
-                        // LEAVE A MESSAGE FOR THE RECIPIENT
-                        val recipientMessageDoc = usersCol
-                                .document(recipientID)
-                                .collection("messages")
-                                .document("transactions")
-                        // the message has an ID equal to "rank" + "username" and a value of the amount sent in GOLD
-                        val str = GetLevelName(curUserData.team, curUserData.experience) + " " + curUserData.username
-                        val newMessage = hashMapOf(Pair(str, selectedAmtInGold)) as Map<String, Any>
-                        batch.set(recipientMessageDoc, newMessage, SetOptions.merge())
+                                // LEAVE A MESSAGE FOR THE RECIPIENT
+                                val message = Experience.GetLevelName(currentAccount.team, currentAccount.experience) + " " + currentAccount.username
+                                // the message is a field in the document and has an 'ID' equal to "rank" + "username" and a 'value' of the amount sent in GOLD
+                                val newMessage = hashMapOf(Pair(message, selectedAmtInGold as Any))
+                                transaction.set(recipientMessageDoc, newMessage, SetOptions.merge())
 
 
+                                // DECREMENT CURRENCY FOR SENDER (and also add XP)
+                                when (selectedCurrency) {
+                                    Currency.GOLD -> {
+                                    } // Again, this should never happen
+                                    Currency.DOLR -> currentAccount.spares.dolr -= selectedAmountInt
+                                    Currency.PENY -> currentAccount.spares.peny -= selectedAmountInt
+                                    Currency.SHIL -> currentAccount.spares.shil -= selectedAmountInt
+                                    Currency.QUID -> currentAccount.spares.quid -= selectedAmountInt
+                                }
+                                // XP is added at the end (i.e. you can't level up mid-transaction and get a better rate), because I'm evil like that.
+                                currentAccount.experience += (selectedAmountInt * 0.02).toInt() // Add some XP as well, why not.
+                                transaction.set(curUserDoc, currentAccount)
 
-                        // Now commit the batch and pray it works.
-                        batch.commit().addOnCompleteListener {
-                            if (it.isSuccessful) {
+
+                                // If the transaction is successful, return the new values of the current user data to update the UI with.
+                                currentAccount // sodding Kotlin, man... can't use "return" in this case.
+                            }.addOnCompleteListener {
+
+                                DataManager.SetCurrentAccountData(it.result!!)
                                 MakeToast(context!!, "Coins sent successfully!")
                                 DataManager.TriggerUIUpdates()
                                 sendingTransactionInProgress = false
-                            }
-                            else {
-                                failTransaction(it.exception?.message ?: "Failed to send coins. Unknown error.")
+
+                            }.addOnFailureListener {
+                                failTransaction(it.message
+                                        ?: "Could not send coins; an unknown error occurred.")
                             }
                         }
-                    }
-                }
-
-
-                // and because this is essentially java-like, we can hack this cheeky function in the listener.
-                fun failTransaction(innerError: String) {
-                    MakeToast(context!!, innerError)
-                    sendingTransactionInProgress = false
-                }
-
-            })
+                    })
 
         }
 

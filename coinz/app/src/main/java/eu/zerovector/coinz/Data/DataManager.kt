@@ -162,7 +162,7 @@ class DataManager {
                 if (!coinIDs.contains(coin.key)) continue
 
                 // If the coin is to be taken, remove it from the map and increment respective currency by its amount.
-                val amount = (coin.value.value * 100).toInt() / 100.0 // doing the rounding now to keep errors at bay
+                val amount = (coin.value.value * 100).toInt() // cast to int to keep rounding errors at bay
                 val walletSize = GetWalletSize() // And forbid coins from exceeding wallet sizes
                 when (coin.value.currency) {
                     Currency.GOLD -> {} // Again, this should never happen
@@ -201,7 +201,7 @@ class DataManager {
         }
 
         // Deposit an amount of "spare change" into the respective bank balance and update quota.
-        fun DepositCoins(currency: Currency, amount: Double) {
+        fun DepositCoins(currency: Currency, amount: Int) {
             currentUserData.dailyDepositsLeft -= amount
             when (currency) {
                 Currency.GOLD -> {
@@ -228,12 +228,13 @@ class DataManager {
             TriggerUIUpdates()
         }
 
-        fun BuySellCoins(currency: Currency, currencyDelta: Double, goldDelta: Double) {
+        fun BuySellCoins(currency: Currency, currencyDelta: Int, goldDelta: Int) {
 
             // We need to round precision off to two decimals for Gold, to prevent rounding errors in the future.
-            val goldDeltaClean = (goldDelta * 100).toInt() / 100.0
+            //val goldDeltaClean = (goldDelta * 100).toInt() / 100.0
+            // No longer a factor when migrating to ints
 
-            currentUserData.balanceGold += goldDeltaClean
+            currentUserData.balanceGold += goldDelta
             when (currency) {
                 Currency.GOLD -> {
                 } // Again, this should never happen
@@ -289,7 +290,7 @@ class DataManager {
             return 25
         }
 
-        fun GetBalance(currency: Currency): Double {
+        fun GetBalance(currency: Currency): Int {
             return when (currency) {
                 Currency.GOLD -> currentUserData.balanceGold // gold balance is separate
                 Currency.DOLR -> currentUserData.balances.dolr
@@ -299,7 +300,7 @@ class DataManager {
             }
         }
 
-        fun GetChange(currency: Currency): Double {
+        fun GetChange(currency: Currency): Int {
             return when (currency) {
                 Currency.GOLD -> currentUserData.balanceGold // gold has no spare change, so we'll go with this instead
                 Currency.DOLR -> currentUserData.spares.dolr
@@ -310,18 +311,18 @@ class DataManager {
         }
 
         // How many coins of each type (except GOLD) can be held at any one time.
-        fun GetWalletSize(): Double =
+        fun GetWalletSize(): Int =
                 if (currentUserData.team == Team.EleventhEchelon)
-                    Experience.GetLevelE11(currentUserData.experience).walletSize.toDouble()
-                else Experience.GetLevelCD(currentUserData.experience).walletSize.toDouble()
+                    Experience.GetLevelE11(currentUserData.experience).walletSize * 100
+                else Experience.GetLevelCD(currentUserData.experience).walletSize * 100
 
 
-        fun GetDailyDepositsLeft(): Double {
+        fun GetDailyDepositsLeft(): Int {
             return currentUserData.dailyDepositsLeft
         }
 
-        fun GetDailyDepositLimit(): Double {
-            return 25.0
+        fun GetDailyDepositLimit(): Int {
+            return 2500
         }
 
         // The rates of currencies to gold, as per the map file, without any "bank penalties".
