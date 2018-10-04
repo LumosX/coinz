@@ -14,7 +14,6 @@ import eu.zerovector.coinz.BuildConfig
 import eu.zerovector.coinz.Data.DataManager
 import eu.zerovector.coinz.Data.DataManager.Companion.DOESNT_EXIST
 import eu.zerovector.coinz.Data.DataManager.Companion.PREFS_NAME
-import eu.zerovector.coinz.Data.DataManager.Companion.PREF_VERSION_CODE_KEY
 import eu.zerovector.coinz.R
 import kotlinx.android.synthetic.main.activity_game.*
 
@@ -99,9 +98,9 @@ class GameActivity : BaseFullscreenActivity(), PermissionsListener {
         // Get current version code
         val currentVersionCode = BuildConfig.VERSION_CODE
 
-        // Get saved version code
+        // Get saved version code for this particular user
         val prefs = getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
-        val savedVersionCode = prefs.getInt(PREF_VERSION_CODE_KEY, DOESNT_EXIST)
+        val savedVersionCode = prefs.getInt(fbAuth.currentUser!!.uid, DOESNT_EXIST)
 
         // Check for first run or upgrade
         //if (currentVersionCode == savedVersionCode) {
@@ -143,7 +142,7 @@ class GameActivity : BaseFullscreenActivity(), PermissionsListener {
 
 
         // Update the shared preferences with the current version code
-        prefs.edit().putInt(PREF_VERSION_CODE_KEY, currentVersionCode).apply()
+        prefs.edit().putInt(fbAuth.currentUser!!.uid, currentVersionCode).apply()
     }
 
 

@@ -62,7 +62,6 @@
         android:layout_marginTop="4dp"
         android:background="@drawable/generic_button"
         android:gravity="center"
-        android:onClick="onSendSpareChangeClicked"
         android:text="SEND SPARE CHANGE"
         android:textSize="16sp" />
 

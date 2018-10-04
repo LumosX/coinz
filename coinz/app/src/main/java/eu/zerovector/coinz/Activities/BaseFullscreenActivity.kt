@@ -1,14 +1,12 @@
 package eu.zerovector.coinz.Activities
 
-import android.content.Context
 import android.content.pm.ActivityInfo
-import android.graphics.Point
-import android.os.Build
 import android.os.Bundle
 import android.os.Handler
 import android.support.v7.app.AppCompatActivity
-import android.view.*
-import java.lang.reflect.InvocationTargetException
+import android.view.View
+import android.view.ViewGroup
+import android.view.Window
 
 open class BaseFullscreenActivity : AppCompatActivity() {
 
@@ -79,51 +77,4 @@ open class BaseFullscreenActivity : AppCompatActivity() {
             View.SYSTEM_UI_FLAG_HIDE_NAVIGATION*/
     }
 
-
-    // Navigation bar sizing utilities
-    fun getNavigationBarSize(context: Context): Point {
-        val appUsableSize = getAppUsableScreenSize(context)
-        val realScreenSize = getRealScreenSize(context)
-
-        // navigation bar on the side
-        if (appUsableSize.x < realScreenSize.x) {
-            return Point(realScreenSize.x - appUsableSize.x, appUsableSize.y)
-        }
-
-        // navigation bar at the bottom
-        return if (appUsableSize.y < realScreenSize.y) {
-            Point(appUsableSize.x, realScreenSize.y - appUsableSize.y)
-        } else Point()
-
-        // navigation bar is not present
-    }
-
-    fun getAppUsableScreenSize(context: Context): Point {
-        val windowManager = context.getSystemService(Context.WINDOW_SERVICE) as WindowManager
-        val display = windowManager.defaultDisplay
-        val size = Point()
-        display.getSize(size)
-        return size
-    }
-
-    fun getRealScreenSize(context: Context): Point {
-        val windowManager = context.getSystemService(Context.WINDOW_SERVICE) as WindowManager
-        val display = windowManager.defaultDisplay
-        val size = Point()
-
-        if (Build.VERSION.SDK_INT >= 17) {
-            display.getRealSize(size)
-        } else if (Build.VERSION.SDK_INT >= 14) {
-            try {
-                size.x = Display::class.java.getMethod("getRawWidth").invoke(display) as Int
-                size.y = Display::class.java.getMethod("getRawHeight").invoke(display) as Int
-            } catch (e: IllegalAccessException) {
-            } catch (e: InvocationTargetException) {
-            } catch (e: NoSuchMethodException) {
-            }
-
-        }
-
-        return size
-    }
 }
