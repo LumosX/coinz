@@ -13,4 +13,8 @@
 
     <!-- and this is to make using mapbox easier -->
     <string name="mapbox_access_token">pk.eyJ1IjoicmFkbXJrdiIsImEiOiJjam1rcDB4cGowcWd3M3Ztc3A3OWVjdW1hIn0.D8ooLER6oVUw1elsGO8hyw</string>
+
+
+    <!-- And this, for good measure.-->
+    <string name="lorem_ipsum"> Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec convallis, ligula vel elementum viverra, lectus odio malesuada nulla, ac tincidunt sem nisl eget tortor. Pellentesque ac risus vestibulum, rutrum libero non, dictum eros. Praesent imperdiet lectus imperdiet, accumsan mauris vel, luctus tortor. Cras rhoncus a turpis vitae auctor. Nulla facilisi. Ut a libero ut ligula vestibulum viverra. Aliquam et est sed tellus pulvinar accumsan ut et arcu. Nullam vel egestas nisl, eget vehicula est. Proin eu neque at est consectetur euismod a in mi. Sed posuere ullamcorper lacus, id iaculis sapien convallis vitae. Aliquam ut arcu in ante viverra vestibulum. Morbi rutrum faucibus viverra. Aliquam eget lacinia nisi, non vehicula turpis. Praesent sollicitudin lacus nec tortor sodales, at vestibulum dui imperdiet. Aliquam sed ligula vel tortor semper lacinia. Praesent dapibus nulla nec quam congue pharetra.</string>
 </resources>

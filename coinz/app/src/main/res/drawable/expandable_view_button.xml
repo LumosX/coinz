@@ -1,0 +1,11 @@
+<selector
+    xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+        android:state_focused="true"
+        android:drawable="@color/darkGrey"/>
+    <item
+        android:state_pressed="true"
+        android:drawable="@color/darkGrey"/>
+
+    <item android:drawable="@drawable/expandable_view_border" />
+</selector>
