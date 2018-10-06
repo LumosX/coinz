@@ -29,8 +29,8 @@ import com.mapbox.mapboxsdk.style.sources.GeoJsonSource
 import eu.zerovector.coinz.Data.Currency
 import eu.zerovector.coinz.Data.DataManager
 import eu.zerovector.coinz.Data.bool
-import eu.zerovector.coinz.Extras.Companion.DrawRadiusPolygon
-import eu.zerovector.coinz.Extras.Companion.GenerateCoinIcon
+import eu.zerovector.coinz.Utils.Companion.DrawRadiusPolygon
+import eu.zerovector.coinz.Utils.Companion.GenerateCoinIcon
 import eu.zerovector.coinz.R
 
 
@@ -180,13 +180,13 @@ class MapFragment : Fragment(), OnMapReadyCallback, LocationEngineListener {
         boundsPolygon.fillColor(Color.RED)
         mapboxMap.addPolygon(boundsPolygon)
 
-        // The giant red box didn't look very good, so I made it very faint (10% opacity), and added a noticeable "border line" as well.
+       /* // The giant red box didn't look very good, so I made it very faint (10% opacity), and added a noticeable "border line" as well.
         val boundsLine = PolylineOptions()
                 .addAll(listOf(bounds.northWest, bounds.northEast, bounds.southEast, bounds.southWest, bounds.northWest))
         boundsLine.alpha(0.85f)
         boundsLine.color(Color.RED)
         boundsLine.width(4f)
-        mapboxMap.addPolyline(boundsLine)
+        mapboxMap.addPolyline(boundsLine)*/
     }
 
 

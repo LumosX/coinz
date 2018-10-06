@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/layoutMessage"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@color/Black"
+    android:clickable="true"
+    android:orientation="horizontal"
+    android:paddingStart="10dp"
+    android:paddingEnd="10dp"
+    android:paddingBottom="10dp"
+    tools:ignore="HardcodedText"
+    tools:layout_editor_absoluteY="10dp">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="4dp"
+        android:layout_weight="1"
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/lblMsgGibberish"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="4dp"
+            android:gravity="start"
+            android:text="gibberishgibberish"
+            android:textAlignment="viewStart"
+            android:ellipsize="end"
+            android:maxLines="1"
+            android:textColor="@color/lightGrey"
+            android:textSize="16sp" />
+
+        <TextView
+            android:id="@+id/lblMsgDifficulty"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="4dp"
+            android:gravity="start"
+            android:text="HARD (Readiness +0.03%)"
+            android:textAlignment="viewStart"
+            android:textColor="@color/basicGrey"
+            android:textSize="16sp" />
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:layout_marginEnd="10dp"
+            android:layout_marginStart="10dp"
+            android:layout_marginTop="4dp"
+            android:background="@color/darkGrey" />
+
+    </LinearLayout>
+
+    <Button
+        android:id="@+id/btnMsgDecrypt"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:background="@drawable/generic_button"
+        android:gravity="center"
+        android:text="DECRYPT\n☄169"
+        android:textSize="16sp" />
+
+
+</LinearLayout>

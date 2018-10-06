@@ -19,8 +19,8 @@ import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.QuerySnapshot
 import com.google.firebase.firestore.SetOptions
 import eu.zerovector.coinz.Data.*
-import eu.zerovector.coinz.Extras.Companion.MakeToast
-import eu.zerovector.coinz.Extras.Companion.toString
+import eu.zerovector.coinz.Utils.Companion.MakeToast
+import eu.zerovector.coinz.Utils.Companion.toString
 import eu.zerovector.coinz.R
 
 class BankFragment : Fragment() {
@@ -244,8 +244,8 @@ class BankFragment : Fragment() {
                             val recipientDoc = usersCol.document(recipientID)
                             val recipientMessageDoc = usersCol
                                     .document(recipientID)
-                                    .collection("messages")
-                                    .document("transactions")
+                                    .collection("Messages")
+                                    .document("Transactions")
 
                             // Decrement spare change on this account, increment gold on the recipient, and send the recipient a message.
                             // Better to do it here than in the DataManager, because we need to "unlock" this (sendingTransactionInProgress) at the end.
@@ -263,8 +263,11 @@ class BankFragment : Fragment() {
 
                                 // LEAVE A MESSAGE FOR THE RECIPIENT
                                 val message = Experience.GetLevelName(currentAccount.team, currentAccount.experience) + " " + currentAccount.username
-                                // the message is a field in the document and has an 'ID' equal to "rank" + "username" and a 'value' of the amount sent in GOLD
-                                val newMessage = hashMapOf(Pair(message, selectedAmtInGold as Any))
+                                // The message is a field in the document and has an 'ID' equal to "rank" + "username".
+                                // Its 'value' is a pair of the daily timestamp string and the amount sent (in GOLD, pre-formatted as double)
+                                val today = DataManager.dailyTimestamp
+                                val valueString = "$today*${selectedAmtInGold / 100.0}"
+                                val newMessage = hashMapOf(Pair(message, valueString as Any))
                                 transaction.set(recipientMessageDoc, newMessage, SetOptions.merge())
 
 
@@ -283,7 +286,7 @@ class BankFragment : Fragment() {
 
 
                                 // If the transaction is successful, return the new values of the current user data to update the UI with.
-                                currentAccount // sodding Kotlin, man... can't use "return" in this case.
+                                currentAccount // sodding Kotlin, man... can't just use "return" in this case.
                             }.addOnCompleteListener {
 
                                 DataManager.SetCurrentAccountData(it.result!!)

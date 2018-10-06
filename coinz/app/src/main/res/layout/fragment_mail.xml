@@ -5,8 +5,8 @@
     android:layout_height="match_parent"
     android:background="@color/Black"
     android:orientation="vertical"
-    tools:ignore="HardcodedText"
-    tools:context=".Activities.Fragments.MailFragment">
+    tools:context=".Activities.Fragments.MailFragment"
+    tools:ignore="HardcodedText">
 
     <TextView
         android:id="@+id/lblExpandingInfo"
@@ -35,34 +35,20 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="vertical" >
+            android:orientation="vertical"
+            android:paddingTop="4dp">
 
-            <eu.zerovector.coinz.Components.ExpandableMessageView
+            <LinearLayout
+                android:id="@+id/layoutMessages"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="vertical" >
-
-            </eu.zerovector.coinz.Components.ExpandableMessageView>
-
-            <eu.zerovector.coinz.Components.ExpandableMessageView
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:orientation="vertical" />
-
-            <eu.zerovector.coinz.Components.ExpandableMessageView
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:orientation="vertical" />
-
-            <eu.zerovector.coinz.Components.ExpandableMessageView
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
                 android:orientation="vertical" />
 
             <Space
                 android:layout_width="match_parent"
                 android:layout_height="100dp" />
         </LinearLayout>
+
     </ScrollView>
 
 </LinearLayout>

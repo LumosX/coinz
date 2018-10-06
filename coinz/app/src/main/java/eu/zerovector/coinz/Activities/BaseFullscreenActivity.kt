@@ -19,7 +19,16 @@ open class BaseFullscreenActivity : AppCompatActivity() {
 
         // Lock application to portrait view
         requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_NOSENSOR
+    }
 
+
+    override fun onDestroy() {
+        super.onDestroy()
+
+      /*  // force kill app at the end in order to prevent issues with Firebase
+        finishAffinity()
+        //System.exit(0)
+        android.os.Process.killProcess(android.os.Process.myPid())*/
     }
 
 

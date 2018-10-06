@@ -12,12 +12,10 @@ import com.ogaclejapan.smarttablayout.utils.v4.FragmentPagerItems
 import eu.zerovector.coinz.Activities.Fragments.*
 import eu.zerovector.coinz.BuildConfig
 import eu.zerovector.coinz.Data.DataManager
-import eu.zerovector.coinz.Data.DataManager.Companion.DOESNT_EXIST
 import eu.zerovector.coinz.Data.DataManager.Companion.PREFS_NAME
 import eu.zerovector.coinz.R
+import eu.zerovector.coinz.Utils.Companion.MakeToast
 import kotlinx.android.synthetic.main.activity_game.*
-
-
 
 
 class GameActivity : BaseFullscreenActivity(), PermissionsListener {
@@ -100,7 +98,7 @@ class GameActivity : BaseFullscreenActivity(), PermissionsListener {
 
         // Get saved version code for this particular user
         val prefs = getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
-        val savedVersionCode = prefs.getInt(fbAuth.currentUser!!.uid, DOESNT_EXIST)
+        val savedVersionCode = prefs.getInt(fbAuth.currentUser!!.uid, -1)
 
         // Check for first run or upgrade
         //if (currentVersionCode == savedVersionCode) {
@@ -116,29 +114,28 @@ class GameActivity : BaseFullscreenActivity(), PermissionsListener {
         }*/
         else {
             // TODO fix strings and so on, to make this a tutorial
-          /*  SpotlightView.Builder(this)
-                    .introAnimationDuration(400)
-                    .enableRevealAnimation(true)
-                    .performClick(true)
-                    .fadeinTextDuration(400)
-                    .headingTvColor(Color.parseColor("#eb273f"))
-                    .headingTvSize(32)
-                    .headingTvText("Love")
-                    .subHeadingTvColor(Color.parseColor("#ffffff"))
-                    .subHeadingTvSize(16)
-                    .subHeadingTvText("Like the picture?\nLet others know.")
-                    .maskColor(Color.parseColor("#dc000000"))
-                    .target(findViewById(R.id.tabLayout))
-                    .lineAnimDuration(400)
-                    .lineAndArcColor(Color.parseColor("#eb273f"))
-                    .dismissOnTouch(true)
-                    .dismissOnBackPress(true)
-                    .enableDismissAfterShown(true)
-                    .usageId("welcome 1") //UNIQUE ID
-                    .show()*/
+            /*  SpotlightView.Builder(this)
+                      .introAnimationDuration(400)
+                      .enableRevealAnimation(true)
+                      .performClick(true)
+                      .fadeinTextDuration(400)
+                      .headingTvColor(Color.parseColor("#eb273f"))
+                      .headingTvSize(32)
+                      .headingTvText("Love")
+                      .subHeadingTvColor(Color.parseColor("#ffffff"))
+                      .subHeadingTvSize(16)
+                      .subHeadingTvText("Like the picture?\nLet others know.")
+                      .maskColor(Color.parseColor("#dc000000"))
+                      .target(findViewById(R.id.tabLayout))
+                      .lineAnimDuration(400)
+                      .lineAndArcColor(Color.parseColor("#eb273f"))
+                      .dismissOnTouch(true)
+                      .dismissOnBackPress(true)
+                      .enableDismissAfterShown(true)
+                      .usageId("welcome 1") //UNIQUE ID
+                      .show()*/
 
         }
-
 
 
         // Update the shared preferences with the current version code
@@ -147,26 +144,39 @@ class GameActivity : BaseFullscreenActivity(), PermissionsListener {
 
 
     //////////////////////// BACK BUTTON SHENANIGANS
-    // Override the "back" button, so that we can safely log out the current account.
+    // Override the "back" button, so that we can safely log out the current account after a double-tap.
+    private var lastTimeBackPressed: Long = 0
+
     override fun onBackPressed() {
+        // Handle double-tap-to-exit functionality
+        if (lastTimeBackPressed + 1000 < System.currentTimeMillis()) {
+            MakeToast(applicationContext, "Tap \"Back\" again to exit game.", false)
+        }
+        lastTimeBackPressed = System.currentTimeMillis()
+
+        super.onBackPressed()
         // This should always work fine, because we don't allow access to this activity if the user isn't signed in yet
         if (fbAuth.currentUser != null) {
             fbAuth.signOut()
-            Toast.makeText(applicationContext, "Logged out!", Toast.LENGTH_SHORT).show()
         }
 
         super.onBackPressed()
-        finish() // also end activity after logging the user out.
+        kill()
     }
 
-    // Same thing if the activity is destroyed.
-    override fun onDestroy() {
+    // Same thing if the activity is stopping.
+    override fun onStop() {
         if (fbAuth.currentUser != null) {
             fbAuth.signOut()
-            Toast.makeText(applicationContext, "Logged out!", Toast.LENGTH_SHORT).show()
         }
 
-        super.onDestroy()
-        finish()
+        super.onStop()
+        kill()
+    }
+
+    // Firebase was leaking threads somehow, preventing the app from closing properly. As a result, I had to use this:
+    private fun kill() {
+        finishAffinity()
+        android.os.Process.killProcess(android.os.Process.myPid())
     }
 }

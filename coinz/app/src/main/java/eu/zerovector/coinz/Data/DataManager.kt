@@ -9,31 +9,44 @@ import com.google.firebase.firestore.SetOptions
 import com.mapbox.mapboxsdk.geometry.LatLng
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
-import eu.zerovector.coinz.Extras.Companion.MakeToast
+import eu.zerovector.coinz.Data.MessageDifficulty.Companion.BITS_PER_DIFFICULTY
+import eu.zerovector.coinz.Utils.Companion.MakeToast
 import java.util.*
 import kotlin.math.min
-
 
 
 class DataManager {
 
     // Stuff inside the companion object is static, apparently
     companion object {
-        // SharedPrefs constants
+        // SharedPrefs constant: we do use this at one point
         const val PREFS_NAME = "CoinZConfig"
-        const val PREF_VERSION_CODE_KEY = "version_code"
-        const val DOESNT_EXIST = -1
 
         private var UIListeners: MutableList<() -> Unit> = mutableListOf()
 
 
         private lateinit var currentUserData: AccountData
-        private var dailyTimestamp: String = ""
+        var dailyTimestamp: String = ""
         var currentCoinsMap: HashMap<String, Map.CoinInfo> = hashMapOf() // the set of all coin IDs taken today.
         var dailyPureRates: Map.Rates = Map.Rates(1.0, 1.0, 1.0, 1.0)
 
         var coinSetDirty: bool = false
         var coinSetUpdateListener: (() -> Unit)? = null
+
+        // Use a single instance of the message settings for all our purposes. We don't want them to change.
+        private var cryptosettings: CryptoSettings? = null
+        // If the current settings (in the backing field) are null, generate a new one.
+        // The seed is formed by the current user ID and the current daily timestamp.
+        // Thus every user gets different messages, but they remain the same during the day.
+        val dailyCryptoSettings: CryptoSettings
+            get() {
+                if (cryptosettings == null) {
+                    cryptosettings = CryptoSettings.Generate(
+                            (FirebaseAuth.getInstance().currentUser!!.uid + dailyTimestamp).hashCode().toLong()
+                    )
+                }
+                return cryptosettings!!
+            }
 
 
         fun SetCurrentAccountData(userData: AccountData) {
@@ -88,11 +101,25 @@ class DataManager {
             // Also grab the timestamp. We need it.
             dailyTimestamp = data.dateGenerated
 
+            val firestore = FirebaseFirestore.getInstance()
+            val fbAuth = FirebaseAuth.getInstance()
+            val usersCol = firestore.collection("Users")
+
             // Reset daily deposit quota if the user is logging in on a new day.
-            // Technically these only update in the DB if you collect a coin or make another action. But that's okay.
             if (currentUserData.lastLoginTimestamp != dailyTimestamp) {
                 currentUserData.lastLoginTimestamp = dailyTimestamp
                 currentUserData.dailyDepositsLeft = GetDailyDepositLimit()
+                // Reset the "decrypted messages" field as well.
+                currentUserData.dailyMessagesDecrypted = 0
+                cryptosettings = null // Reset the cryptosettings as well, just to be safe. It's a new day after all...
+
+                // Update these values in the database right now, because I don't feel particularly safe not doing it.
+                val curUserDoc = usersCol.document(fbAuth.currentUser!!.uid)
+                val batch = firestore.batch()
+                batch.update(curUserDoc, "lastLoginTimestamp", dailyTimestamp)
+                batch.update(curUserDoc, "dailyDepositsLeft", currentUserData.dailyDepositsLeft)
+                batch.update(curUserDoc, "dailyMessagesDecrypted", 0)
+                batch.commit()
             }
 
 
@@ -104,12 +131,9 @@ class DataManager {
 
             // First, get current coin situations from the Firebase.
             // If the login is successful, we update local data.
-            val firestore = FirebaseFirestore.getInstance()
-            val fbAuth = FirebaseAuth.getInstance()
-            val usersCol = firestore.collection("Users")
             val coinDoc = usersCol
                     .document(fbAuth.currentUser!!.uid)
-                    .collection("coins")
+                    .collection("Coins")
                     .document(dailyTimestamp)
 
             // Well, we need to get it from Firebase first:
@@ -165,7 +189,8 @@ class DataManager {
                 val amount = (coin.value.value * 100).toInt() // cast to int to keep rounding errors at bay
                 val walletSize = GetWalletSize() // And forbid coins from exceeding wallet sizes
                 when (coin.value.currency) {
-                    Currency.GOLD -> {} // Again, this should never happen
+                    Currency.GOLD -> {
+                    } // Again, this should never happen
                     Currency.DOLR -> currentUserData.spares.dolr = min(amount + currentUserData.spares.dolr, walletSize)
                     Currency.PENY -> currentUserData.spares.peny = min(amount + currentUserData.spares.peny, walletSize)
                     Currency.SHIL -> currentUserData.spares.shil = min(amount + currentUserData.spares.shil, walletSize)
@@ -192,7 +217,7 @@ class DataManager {
             val usersCol = firestore.collection("Users")
             val coinDoc = usersCol
                     .document(fbAuth.currentUser!!.uid)
-                    .collection("coins")
+                    .collection("Coins")
                     .document(dailyTimestamp)
             coinDoc.set(coinsTakenMap, SetOptions.merge()) // We shouldn't need a listener.
             UpdateFirebaseData()
@@ -274,6 +299,7 @@ class DataManager {
         }
 
 
+        ////// ACCESS FUNCTIONS
         fun GetUsername(): String {
             return currentUserData.username
         }
@@ -288,6 +314,14 @@ class DataManager {
 
         fun GetGrabRadiusInMetres(): Int {
             return 25
+        }
+
+        fun GetCompute(): Int {
+            return currentUserData.compute
+        }
+
+        fun SetCompute(compute: Int) {
+            currentUserData.compute = compute
         }
 
         fun GetBalance(currency: Currency): Int {
@@ -350,6 +384,34 @@ class DataManager {
         fun GetSellPrice(currency: Currency): Double {
             return GetPureRate(currency) * (1 - (GetBankCommissionRate() / 100.0))
         }
+
+
+        ////// STUFF FOR THE CRYPTOMESSAGES
+        fun SetMessageDecrypted(difficulty: MessageDifficulty, index: Int) {
+            if (index < 0 || index > 4) return
+            // Mask individual messages as bits in the larger integer. Just set the "bit" we need.
+            // Note that I've not implemented the ability to RESET bits, so be careful with this.
+            // (We don't ever NEED to reset bits, which is why that's the case)
+            val offset = 2.toLong() shl (index + BITS_PER_DIFFICULTY * difficulty.ordinal)
+            // To set a bit, just 'OR' it.
+            currentUserData.dailyMessagesDecrypted = (currentUserData.dailyMessagesDecrypted or offset)
+
+            // Update the DB just in case the user's trying to pretend he's smart.
+            val firestore = FirebaseFirestore.getInstance()
+            val fbAuth = FirebaseAuth.getInstance()
+            val usersCol = firestore.collection("Users")
+            val curUserDoc = usersCol.document(fbAuth.currentUser!!.uid)
+            curUserDoc.update("dailyMessagesDecrypted", currentUserData.dailyMessagesDecrypted)
+
+        }
+
+        fun GetMessageDecrypted(difficulty: MessageDifficulty, index: Int): bool {
+            if (index < 0 || index > 4) return false
+            // In this case, we 'AND' the number and the message offset to check if the "flag" has been set.
+            val offset = 2.toLong() shl (index + BITS_PER_DIFFICULTY * difficulty.ordinal)
+            return (currentUserData.dailyMessagesDecrypted and offset) > 0
+        }
+
 
     }
 

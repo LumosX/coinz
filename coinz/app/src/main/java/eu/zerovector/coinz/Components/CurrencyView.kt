@@ -12,8 +12,8 @@ import android.widget.SeekBar.OnSeekBarChangeListener
 import com.mapbox.mapboxsdk.Mapbox.getApplicationContext
 import eu.zerovector.coinz.Data.Currency
 import eu.zerovector.coinz.Data.DataManager
-import eu.zerovector.coinz.Extras.Companion.MakeToast
-import eu.zerovector.coinz.Extras.Companion.toString
+import eu.zerovector.coinz.Utils.Companion.MakeToast
+import eu.zerovector.coinz.Utils.Companion.toString
 import eu.zerovector.coinz.R
 import kotlin.math.min
 

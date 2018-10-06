@@ -16,9 +16,10 @@ import com.google.firebase.auth.FirebaseAuth
 import eu.zerovector.coinz.Data.DataManager
 import eu.zerovector.coinz.Data.Experience
 import eu.zerovector.coinz.Data.Team
-import eu.zerovector.coinz.Extras.Companion.MakeToast
-import eu.zerovector.coinz.Extras.Companion.toString
 import eu.zerovector.coinz.R
+import eu.zerovector.coinz.Utils
+import eu.zerovector.coinz.Utils.Companion.MakeToast
+import eu.zerovector.coinz.Utils.Companion.toString
 
 class StatsFragment : Fragment() {
 
@@ -112,7 +113,6 @@ class StatsFragment : Fragment() {
         val progressBarRes = if (curTeam == Team.EleventhEchelon) R.drawable.progressbar_e11 else R.drawable.progressbar_cd
         pbXP.progressDrawable = ContextCompat.getDrawable(context!!, progressBarRes)
 
-
         // Player and XP stuff
         var teamNameAllCaps = if (curTeam == Team.EleventhEchelon) "ELEVENTH ECHELON" else "CRIMSON DAWN"
         lblNameFaction.text = "${DataManager.GetUsername()}, $teamNameAllCaps"
@@ -124,7 +124,13 @@ class StatsFragment : Fragment() {
         val curLevelMinXP = Experience.GetMinXPForLevel(curLevel)
         val nextLevelMinXP = Experience.GetMinXPForLevel(curLevel + 1)
         // TODO: Animate the progress bar. Maybe.
-        pbXP.progress = (((curXP - curLevelMinXP) / (nextLevelMinXP - curLevelMinXP).toDouble()) * 100).toInt()
+        val targetProgress = (((curXP - curLevelMinXP) / (nextLevelMinXP - curLevelMinXP).toDouble()) * 100).toInt()
+        val anim = Utils.ProgressBarAnimation(pbXP, pbXP.progress / 100.0f, targetProgress / 100.0f)
+        anim.duration = 500
+        anim.start()
+
+
+
         lblXP.text = "$curXP/$nextLevelMinXP"
 
         // Currency rates
@@ -145,5 +151,4 @@ class StatsFragment : Fragment() {
 
 
     }
-
 }

@@ -16,6 +16,7 @@ data class AccountData (
         var compute: Int = 0,
 
         var dailyDepositsLeft: Int = 2500,
+        var dailyMessagesDecrypted: Long = 0, // enforce 64 bits on this one, just in case, since it's a bit-mask
 
         // Bank stuff
         var balanceGold: Int = 20000,

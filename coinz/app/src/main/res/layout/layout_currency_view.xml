@@ -49,7 +49,7 @@
             <Button
                 android:id="@+id/btnCurrencyBuy"
                 android:layout_width="match_parent"
-                android:layout_height="35dp"
+                android:layout_height="30dp"
                 android:layout_weight="1"
                 android:background="@drawable/generic_button"
                 android:gravity="center"
@@ -81,7 +81,7 @@
             <Button
                 android:id="@+id/btnCurrencySell"
                 android:layout_width="match_parent"
-                android:layout_height="35dp"
+                android:layout_height="30dp"
                 android:layout_weight="1"
                 android:background="@drawable/generic_button"
                 android:gravity="center"
@@ -112,7 +112,7 @@
             <Button
                 android:id="@+id/btnCurrencyDeposit"
                 android:layout_width="match_parent"
-                android:layout_height="35dp"
+                android:layout_height="30dp"
                 android:layout_weight="1"
                 android:background="@drawable/generic_button"
                 android:gravity="center"

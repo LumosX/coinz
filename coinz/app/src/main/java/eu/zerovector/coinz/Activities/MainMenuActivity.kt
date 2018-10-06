@@ -27,6 +27,7 @@ class MainMenuActivity : BaseFullscreenActivity() {
         // Set up the user interaction to manually show or hide the system UI.
         layoutSplash.setOnClickListener { onSplashScreenClicked() }
 
+
         // Also set the visibility layouts up
         layoutMainMenu.visibility = View.INVISIBLE
         layoutSplash.visibility = View.VISIBLE
@@ -56,6 +57,7 @@ class MainMenuActivity : BaseFullscreenActivity() {
     // Add a third button for quick logins for testing reasons
     // DELETE THIS ONCE DONE
     fun onTestLoginClicked(view: View) {
+
         // If the data validates, register.
         var dialogBuilder = AlertDialog.Builder(this@MainMenuActivity)
                 .setMessage("Signing in... Please wait.")
@@ -86,7 +88,7 @@ class MainMenuActivity : BaseFullscreenActivity() {
                                     DataManager.SetCurrentAccountData(userData)
 
                                     // Then we just need to move to the new activity.
-                                    finish()
+                                    //finish()
                                     startActivity(Intent(this@MainMenuActivity, GameActivity::class.java))
                                 }
                             }

@@ -43,6 +43,8 @@ class RegisterActivity : BaseFullscreenActivity(), View.OnTouchListener {
         teamSelectorVisible = true
         toggleSelectedTeam(true) // select eleventh echelon by default
 
+        btnConfirmDetails.isEnabled = true
+
         gestureDetector = GestureDetector(this, object : OnSwipeListener() {
             override fun onSwipe(direction: Direction): Boolean {
                 // Swipe left for Eleventh Echelon, swipe right for Crimson Dawn
@@ -81,6 +83,8 @@ class RegisterActivity : BaseFullscreenActivity(), View.OnTouchListener {
     }
 
     fun onConfirmClicked(view: View) {
+        btnConfirmDetails.isEnabled = false
+
         // First, set-up strings for ease of use
         val email = tbEmail.text.toString().trim()
         val pass = tbPassword.text.toString().trim()
@@ -151,6 +155,7 @@ class RegisterActivity : BaseFullscreenActivity(), View.OnTouchListener {
                                             // Move to the new activity as well.
                                             finish()
                                             startActivity(Intent(this@RegisterActivity, GameActivity::class.java))
+                                            btnConfirmDetails.isEnabled = true
                                         } else {
                                             failRegistration(innerTask.exception?.message!!)
                                         }
@@ -174,69 +179,12 @@ class RegisterActivity : BaseFullscreenActivity(), View.OnTouchListener {
                         .setNeutralButton("Close", null)
                 val failureDialog = dialogBuilder.create()
                 failureDialog.show()
+                btnConfirmDetails.isEnabled = true
             }
 
         })
 
 
-        /* usersDBBranch.orderByChild("username").equalTo(username)
-                 .addListenerForSingleValueEvent(object : ValueEventListener {
-                     override fun onDataChange(snap: DataSnapshot) {
-                         // If a user with this name exists, fail
-                         if (snap.value != null) {
-                             failRegistration("Username already exists.")
-                         // Otherwise, don't fail.
-                         } else {
-                             // Indeed, if ALL data validates, register.
-                             // Callbacks inside callbacks inside callbacks inside callbacks inside ca...
-
-                             // If the data "validates", register.
-                             fbAuth
-                                     .createUserWithEmailAndPassword(email, pass)
-                                     .addOnCompleteListener { task ->
-                                         // No matter the result, hide the waiting dialog box.
-                                         waitDialog.dismiss()
-
-                                         // If all's well, make a toast.
-                                         if (task.isSuccessful) {
-                                             Toast.makeText(applicationContext, "Registration successful! Please wait...", Toast.LENGTH_SHORT).show()
-
-                                             // I'd love to move this to the DataManager, but it'd be a pain in the arse, so it's here.
-                                             // Add the new user data to the database, with modified name and team entries
-                                             val user: AccountData = AccountData(username = username, team = team)
-
-                                             val curUserBranch = usersDBBranch.child(fbAuth.currentUser!!.uid)
-                                             curUserBranch.setValue(user)
-
-                                             // "Login" locally
-                                             DataManager.SetCurrentAccountData(user)
-
-                                             // Move to the new activity as well.
-                                             finish()
-                                             startActivity(Intent(this@RegisterActivity, GameActivity::class.java))
-
-                                         } else {
-                                             failRegistration(task.exception?.message!!)
-                                         }
-                                     }
-                         }
-                     }
-
-                     override fun onCancelled(p0: DatabaseError) {
-                         failRegistration("Could not validate username. Try again later.\n${p0.message}")
-                     }
-
-                     // and because this is essentially java-like, we can hack in this cheeky function.
-                     fun failRegistration(innerError: String) {
-                         waitDialog.dismiss()
-                         dialogBuilder = AlertDialog.Builder(this@RegisterActivity)
-                                 .setMessage("Registration failed!\n$innerError")
-                                 .setNeutralButton("Close", null)
-                         val failureDialog = dialogBuilder.create()
-                         failureDialog.show()
-                     }
-
-                 })*/
     }
 
 

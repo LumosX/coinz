@@ -34,7 +34,7 @@ class ExpandableMessageView : LinearLayout {
 
         btnExpand = currentView.findViewById(R.id.btnExpand)
         lblMessage = currentView.findViewById(R.id.lblMessage)
-        messageTargetHeight = lblMessage.measuredHeight
+        messageTargetHeight = lblMessage.height
 
         // Hook listener up and hide the message
         btnExpand.setOnClickListener(::onButtonClicked)
@@ -53,8 +53,9 @@ class ExpandableMessageView : LinearLayout {
         if (!isCurrentlyExpanded) lblMessage.visibility = View.VISIBLE
 
         val targetHeight = if (isCurrentlyExpanded) 0 else messageTargetHeight
+        val startingHeight = if (isCurrentlyExpanded) messageTargetHeight else 0
 
-        val anim = ValueAnimator.ofInt(lblMessage.measuredHeight, 0)
+        val anim = ValueAnimator.ofInt(startingHeight, targetHeight)
         anim.addUpdateListener { valueAnimator ->
             val value = valueAnimator.animatedValue as Int
             val layoutParams = lblMessage.layoutParams
@@ -82,6 +83,10 @@ class ExpandableMessageView : LinearLayout {
         anim.duration = 200
         anim.start()
 
+    }
+
+    fun SetSenderAndSubject(sender: String, subject: String) {
+        btnExpand.text = "From: $sender\nSubject: $subject"
     }
 
     fun SetMessageText(message: String) {

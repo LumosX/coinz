@@ -9,6 +9,9 @@ import android.support.annotation.ColorInt
 import android.support.annotation.DrawableRes
 import android.support.v4.content.res.ResourcesCompat
 import android.support.v4.graphics.drawable.DrawableCompat
+import android.view.animation.Animation
+import android.view.animation.Transformation
+import android.widget.ProgressBar
 import android.widget.Toast
 import com.mapbox.geojson.Point
 import com.mapbox.mapboxsdk.annotations.Icon
@@ -16,10 +19,10 @@ import com.mapbox.mapboxsdk.annotations.IconFactory
 import com.mapbox.mapboxsdk.annotations.PolygonOptions
 import com.mapbox.mapboxsdk.geometry.LatLng
 import eu.zerovector.coinz.Data.bool
+import java.util.*
 
 
-
-class Extras {
+class Utils {
 
     companion object {
 
@@ -35,8 +38,8 @@ class Extras {
             // return "%.$numDecimals".format(this)
 
             // I guess we'll have to HACK IT then:
-           // val factor = 10.0.pow(numDecimals)
-           // return (Math.round(this * factor) / factor).toString()
+            // val factor = 10.0.pow(numDecimals)
+            // return (Math.round(this * factor) / factor).toString()
 
             // Actually, this seems to work:
             return java.lang.String.format("%.${numDecimals}f", this)
@@ -89,8 +92,26 @@ class Extras {
         }
 
 
+        // And a cheeky little extension method to give us integers with boundaries
+        fun Random.nextInt(min: Int, max: Int): Int {
+            if (min >= max) {
+                throw IllegalArgumentException("max must be greater than min")
+            }
+            return this.nextInt(max - min + 1) + min
+        }
+
     }
 
+    // from https://stackoverflow.com/a/18015071
+    class ProgressBarAnimation(private val progressBar: ProgressBar, private val from: Float, private val to: Float) : Animation() {
+
+        override fun applyTransformation(interpolatedTime: Float, t: Transformation) {
+            super.applyTransformation(interpolatedTime, t)
+            val value = from + (to - from) * interpolatedTime
+            progressBar.progress = value.toInt()
+        }
+
+    }
 
 
 }
