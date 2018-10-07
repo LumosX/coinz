@@ -40,7 +40,7 @@ class GameActivity : BaseFullscreenActivity(), PermissionsListener {
                 supportFragmentManager, FragmentPagerItems.with(this)
                 .add("Map", MapFragment::class.java)
                 .add("Bank", BankFragment::class.java)
-                .add("War", WarFragment::class.java)
+                .add("Ops", WarFragment::class.java)
                 .add("Stats", StatsFragment::class.java)
                 .add("Mail", MailFragment::class.java)
                 .create())

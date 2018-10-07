@@ -14,7 +14,7 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="4dp"
         android:gravity="center"
-        android:text="WAR STATUS:"
+        android:text="BOMB LOCATION (READINESS):"
         android:textAlignment="center"
         android:textColor="@color/lightGrey"
         android:textSize="16sp" />
@@ -25,7 +25,7 @@
         android:layout_height="wrap_content"
         android:layout_marginBottom="4dp"
         android:gravity="center"
-        android:text="(Whichever team reaches 100% first wins the game)"
+        android:text="(Help your team reach 100% to win)"
         android:textAlignment="center"
         android:textColor="@color/basicGrey"
         android:textSize="14sp" />

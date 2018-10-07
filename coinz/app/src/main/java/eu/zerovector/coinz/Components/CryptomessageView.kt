@@ -8,9 +8,12 @@ import android.view.View
 import android.widget.Button
 import android.widget.LinearLayout
 import android.widget.TextView
+import eu.zerovector.coinz.Data.CryptoSettings
 import eu.zerovector.coinz.Data.DataManager
 import eu.zerovector.coinz.Data.MessageDifficulty
+import eu.zerovector.coinz.Data.MessageDifficulty.Companion.BONUS_VALUE_MULTIPLIER
 import eu.zerovector.coinz.R
+import eu.zerovector.coinz.Utils.Companion.toString
 
 
 @SuppressLint("SetTextI18n")
@@ -35,7 +38,7 @@ class CryptomessageView : LinearLayout {
         lblDifficulty = currentView.findViewById(R.id.lblMsgDifficulty)
 
         // Init some fake data here for no reason
-        SetData(-1, MessageDifficulty.Easy, 169)
+        SetData(-1, MessageDifficulty.Easy, CryptoSettings.MessageInfo(169, 1))
     }
 
     // And this sets the onClick listener for the "decrypt" button.
@@ -51,10 +54,10 @@ class CryptomessageView : LinearLayout {
     }
 
     // Public message setup listener.
-    fun SetData(identityIndex: Int, diff: MessageDifficulty, price: Int) {
+    fun SetData(identityIndex: Int, diff: MessageDifficulty, data: CryptoSettings.MessageInfo) {
         // Liking up the price and the difficulty is easy.
-        btnDecrypt.text = "DECRYPT\n☄$price"
-        lblDifficulty.text = "${diff.name.toUpperCase()} (Readiness +${diff.decryptionBonus}%)"
+        btnDecrypt.text = "DECRYPT\n☄${data.price}"
+        lblDifficulty.text = "${diff.name.toUpperCase()} (Readiness +${(data.bonusNoMultiplier * BONUS_VALUE_MULTIPLIER).toString(3)}%)"
 
         // This is the value that determines WHICH message this specific one is.
         messageIndex = identityIndex

@@ -19,9 +19,9 @@ import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.QuerySnapshot
 import com.google.firebase.firestore.SetOptions
 import eu.zerovector.coinz.Data.*
+import eu.zerovector.coinz.R
 import eu.zerovector.coinz.Utils.Companion.MakeToast
 import eu.zerovector.coinz.Utils.Companion.toString
-import eu.zerovector.coinz.R
 
 class BankFragment : Fragment() {
 
@@ -295,8 +295,8 @@ class BankFragment : Fragment() {
                                 sendingTransactionInProgress = false
 
                             }.addOnFailureListener {
-                                failTransaction(it.message
-                                        ?: "Could not send coins; an unknown error occurred.")
+                                failTransaction("Could not send coins. " +
+                                        (it.message ?: "An unknown error occurred."))
                             }
                         }
                     })

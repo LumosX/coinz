@@ -387,14 +387,29 @@ class DataManager {
 
 
         ////// STUFF FOR THE CRYPTOMESSAGES
-        fun SetMessageDecrypted(difficulty: MessageDifficulty, index: Int) {
-            if (index < 0 || index > 4) return
+        // Gets the encryption status of a daily message.
+        fun GetMessageDecrypted(difficulty: MessageDifficulty, index: Int): bool {
+            if (index < 0 || index > 4) return false
+            // In this case, we 'AND' the number and the message offset to check if the "flag" has been set.
+            val offset = 2.toLong() shl (index + BITS_PER_DIFFICULTY * difficulty.ordinal)
+            return (currentUserData.dailyMessagesDecrypted and offset) > 0
+        }
+
+        // Updates a message status and returns the resulting mask. TO BE USED IN THE UPDATE TRANSACTION (does not update local data).
+        fun PretendSetMessageDecrypted(difficulty: MessageDifficulty, index: Int): Long {
+            if (index < 0 || index > 4) return currentUserData.dailyMessagesDecrypted
+
             // Mask individual messages as bits in the larger integer. Just set the "bit" we need.
             // Note that I've not implemented the ability to RESET bits, so be careful with this.
             // (We don't ever NEED to reset bits, which is why that's the case)
             val offset = 2.toLong() shl (index + BITS_PER_DIFFICULTY * difficulty.ordinal)
             // To set a bit, just 'OR' it.
-            currentUserData.dailyMessagesDecrypted = (currentUserData.dailyMessagesDecrypted or offset)
+            return (currentUserData.dailyMessagesDecrypted or offset)
+        }
+
+        // Force-sets the message to "decrypted" and updates local data, as well as the database. To be used in extreme cases.
+        fun ForceSetMessageDecrypted(difficulty: MessageDifficulty, index: Int) {
+            currentUserData.dailyMessagesDecrypted = PretendSetMessageDecrypted(difficulty, index)
 
             // Update the DB just in case the user's trying to pretend he's smart.
             val firestore = FirebaseFirestore.getInstance()
@@ -403,13 +418,6 @@ class DataManager {
             val curUserDoc = usersCol.document(fbAuth.currentUser!!.uid)
             curUserDoc.update("dailyMessagesDecrypted", currentUserData.dailyMessagesDecrypted)
 
-        }
-
-        fun GetMessageDecrypted(difficulty: MessageDifficulty, index: Int): bool {
-            if (index < 0 || index > 4) return false
-            // In this case, we 'AND' the number and the message offset to check if the "flag" has been set.
-            val offset = 2.toLong() shl (index + BITS_PER_DIFFICULTY * difficulty.ordinal)
-            return (currentUserData.dailyMessagesDecrypted and offset) > 0
         }
 
 

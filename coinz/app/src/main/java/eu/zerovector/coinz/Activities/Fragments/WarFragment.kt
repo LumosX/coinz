@@ -10,12 +10,13 @@ import android.widget.Button
 import android.widget.LinearLayout
 import android.widget.ProgressBar
 import android.widget.TextView
+import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.DocumentSnapshot
 import com.google.firebase.firestore.EventListener
 import com.google.firebase.firestore.FirebaseFirestore
 import eu.zerovector.coinz.Components.CryptomessageView
-import eu.zerovector.coinz.Data.DataManager
-import eu.zerovector.coinz.Data.MessageDifficulty
+import eu.zerovector.coinz.Data.*
+import eu.zerovector.coinz.Data.MessageDifficulty.Companion.BONUS_VALUE_MULTIPLIER
 import eu.zerovector.coinz.R
 import eu.zerovector.coinz.Utils.Companion.MakeToast
 import eu.zerovector.coinz.Utils.Companion.toString
@@ -35,6 +36,8 @@ class WarFragment : Fragment() {
     private var progressE11: Double = 11.0
     private var progressCD: Double = 11.0
 
+    private var isDecryptingMessage = false // again, a flag to prevent us from retrying the same transaction.
+
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
                               savedInstanceState: Bundle?): View? {
@@ -51,6 +54,8 @@ class WarFragment : Fragment() {
         cryptoContainer = view.findViewById(R.id.layoutCryptoMessages)
 
         btnBuyCompute.setOnClickListener { OnBuyComputeClicked() }
+
+        isDecryptingMessage = false
 
         // Now hook this up to the War status in Firebase
         val warDoc = FirebaseFirestore.getInstance()
@@ -85,15 +90,15 @@ class WarFragment : Fragment() {
         messageViews = mutableListOf()
 
         // But let's get a little helper first:
-        fun makeMessageView(index: Int, diff: MessageDifficulty, price: Int) {
+        fun makeMessageView(index: Int, diff: MessageDifficulty, data: CryptoSettings.MessageInfo) {
             val view = CryptomessageView(context!!)
-            view.SetData(index, diff, price)
+            view.SetData(index, diff, data)
 
             // Safety check for re-logs: if the message's already been decrypted, flag it as such.
             if (DataManager.GetMessageDecrypted(diff, index)) view.SetDecrypted()
 
             // Link listeners up.
-            view.SetDecryptionListener { OnMessageDecryptionAttempted(view, index, diff, price) }
+            view.SetDecryptionListener { OnMessageDecryptionAttempted(view, index, diff, data) }
 
             messageViews.add(Triple(view, index, diff))
             cryptoContainer.addView(view)
@@ -101,14 +106,14 @@ class WarFragment : Fragment() {
 
         // Get settings, then create views for all of them necessary
         val settings = DataManager.dailyCryptoSettings
-        for (i in settings.easyMessagePrices.indices) {
-            makeMessageView(i, MessageDifficulty.Easy, settings.easyMessagePrices[i])
+        for (i in settings.easyMessages.indices) {
+            makeMessageView(i, MessageDifficulty.Easy, settings.easyMessages[i])
         }
-        for (i in settings.mediumMessagePrices.indices) {
-            makeMessageView(i, MessageDifficulty.Medium, settings.mediumMessagePrices[i])
+        for (i in settings.mediMessages.indices) {
+            makeMessageView(i, MessageDifficulty.Medium, settings.mediMessages[i])
         }
-        for (i in settings.hardMessagePrices.indices) {
-            makeMessageView(i, MessageDifficulty.Hard, settings.hardMessagePrices[i])
+        for (i in settings.hardMessages.indices) {
+            makeMessageView(i, MessageDifficulty.Hard, settings.hardMessages[i])
         }
 
     }
@@ -122,14 +127,12 @@ class WarFragment : Fragment() {
             pbReadinessCD.progress = 0
             lblReadinessE11.text = "ELEVENTH ECHELON: VICTORY!"
             lblReadinessCD.text = "CRIMSON DAWN: DEFEAT!"
-        }
-        else if (progressCD >= progressE11 && progressCD >= 100) {
+        } else if (progressCD >= progressE11 && progressCD >= 100) {
             pbReadinessE11.progress = 0
             pbReadinessCD.progress = 100
             lblReadinessE11.text = "ELEVENTH ECHELON: DEFEAT!"
             lblReadinessCD.text = "CRIMSON DAWN: VICTORY!"
-        }
-        else {
+        } else {
             pbReadinessE11.progress = progressE11.toInt()
             pbReadinessCD.progress = progressCD.toInt()
             lblReadinessE11.text = "ELEVENTH ECHELON: (${progressE11.toString(3)}%)"
@@ -146,6 +149,7 @@ class WarFragment : Fragment() {
 
     }
 
+
     fun OnBuyComputeClicked() {
 
         // todo create an alert dialog with a spinner that allows for the selection of a "Provider" (partly faction-specific).
@@ -155,22 +159,73 @@ class WarFragment : Fragment() {
     }
 
 
-    fun OnMessageDecryptionAttempted(view: CryptomessageView, index: Int, diff: MessageDifficulty, price: Int) {
+
+    fun OnMessageDecryptionAttempted(view: CryptomessageView, index: Int, diff: MessageDifficulty, data: CryptoSettings.MessageInfo) {
+        if (isDecryptingMessage) return
+
         // If the message has already been decrypted (and somehow not flagged as such?), flag it:
         if (DataManager.GetMessageDecrypted(diff, index)) {
             view.SetDecrypted()
             MakeToast(context!!, "Message already decrypted.")
             return
         }
-        if (DataManager.GetCompute() < price) {
+        if (DataManager.GetCompute() < data.price) {
             MakeToast(context!!, "Insufficient compute available.")
             return
         }
 
-        // If all's well...
-        // TODO run firestore transaction to increment faction readiness amount and to update compute amounts for us.
+        // If all's well, run a transaction to update the war status and to update compute amounts for us.
+        val firestore = FirebaseFirestore.getInstance()
+        val curUserID = FirebaseAuth.getInstance().currentUser!!.uid
+        val curUserDoc = firestore.collection("Users").document(curUserID)
+        val warDoc = firestore.collection("War").document("Status")
 
-    }
+        MakeToast(context!!, "Decrypting message...")
+
+        isDecryptingMessage = true // "Lock" operations until the transaction succeeds or fails
+
+        val curTeam = DataManager.GetTeam()
+
+        firestore.runTransaction { transaction ->
+            // A document must exist for both users, so I can unwrap!! the nullable type
+            val currentAccount = transaction.get(curUserDoc).toObject(AccountData::class.java)!!
+            val warDocFieldName = if (curTeam == Team.EleventhEchelon) "E11" else "CD"
+            val rawProgress = transaction.get(warDoc)[warDocFieldName]
+
+            // SET MESSAGE DECRYPTED "BIT" AND UPDATE COMPUTE BALANCE
+            val newMessageMask = DataManager.PretendSetMessageDecrypted(diff, index)
+            currentAccount.dailyMessagesDecrypted = newMessageMask
+            currentAccount.compute -= data.price
+            val XPBonus = data.bonusNoMultiplier * 2 // add XP equal to 2x the int value of the bonus (i.e. 6-80)
+            currentAccount.experience += XPBonus
+            transaction.set(curUserDoc, currentAccount)
+
+
+            // UPDATE TEAM'S READINESS
+            // "decode" value type first (it might be Long or Double, we don't know)
+            var teamProgress = (rawProgress as? Long)?.toDouble() ?: rawProgress as Double
+            teamProgress += data.bonusNoMultiplier * BONUS_VALUE_MULTIPLIER
+            transaction.update(warDoc, warDocFieldName, teamProgress)
+
+
+            // And if the transaction goes well, might as well use the updated values of the current account for UI updates.
+            // All of this should be safe, since transactions are atomic, right?
+            Pair(currentAccount, XPBonus)
+        }.addOnCompleteListener {
+            val newData = it.result!!.first
+            val gainedXP = it.result!!.second
+            DataManager.SetCurrentAccountData(newData)
+            MakeToast(context!!, "Message decrypted! $gainedXP XP received!")
+            UpdateUI() // no need for a global UI update, because this screen is pretty much on its own
+            isDecryptingMessage = false
+
+        }.addOnFailureListener {
+            MakeToast(context!!, "Could not decrypt message. " + (it.message ?: "An unknown error occurred."))
+            isDecryptingMessage = false
+        }
+
+
+}
 
 
 }

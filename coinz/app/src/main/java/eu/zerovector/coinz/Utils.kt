@@ -100,6 +100,13 @@ class Utils {
             return this.nextInt(max - min + 1) + min
         }
 
+        // also one for doubles
+        fun Random.nextDouble(min: Double, max: Double): Double {
+            if (min >= max) {
+                throw IllegalArgumentException("max must be greater than min")
+            }
+            return min + (this.nextDouble() * (max - min))
+        }
     }
 
     // from https://stackoverflow.com/a/18015071
