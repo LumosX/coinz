@@ -151,10 +151,8 @@ class WarFragment : Fragment() {
 
 
     fun OnBuyComputeClicked() {
-
         // todo create an alert dialog with a spinner that allows for the selection of a "Provider" (partly faction-specific).
         // Providers probably charge a fixed price for a fixed amount of compute provided.
-        // todo consider giving different messages of the same difficulty slightly different readiness bonuses. It's just weird otherwise.
 
     }
 

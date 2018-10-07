@@ -14,7 +14,6 @@ enum class MessageDifficulty(val minBonus: Int, val maxBonus: Int, val minPrice:
     Hard(30, 40, 500, 1000); // Average = 0.035%
 
 
-
     companion object {
         const val MIN_MESSAGES_PER_DIFFICULTY = 1
         const val MAX_EASY_MESSAGES = 12

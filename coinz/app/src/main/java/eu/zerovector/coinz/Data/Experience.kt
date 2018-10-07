@@ -126,14 +126,14 @@ enum class E11Levels(val textForm: String, val bankCommissionPercent: Double, va
 }
 
 enum class CDLevels(val textForm: String, val computeDiscountPercent: Int, val walletSize: Int) {
-    Level1("Recruit", 1, 18),
+    Level1("Recruit", 2, 18),
     Level2("Grunt", 3, 18),
-    Level3("Enforcer", 3, 20),
+    Level3("Enforcer", 4, 20),
     Level4("Veteran", 5, 20),
-    Level5("Specialist", 5, 25),
+    Level5("Specialist", 6, 25),
     Level6("Elite", 7, 30),
-    Level7("Expert", 8, 30),
-    Level8("Master at Arms", 8, 35),
-    Level9("Operative", 10, 35),
+    Level7("Expert", 9, 30),
+    Level8("Master at Arms", 11, 35),
+    Level9("Operative", 13, 35),
     Level10("Operations Commander", 15, 45),
 }
