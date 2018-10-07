@@ -389,7 +389,7 @@ class DataManager {
         ////// STUFF FOR THE CRYPTOMESSAGES
         // Gets the encryption status of a daily message.
         fun GetMessageDecrypted(difficulty: MessageDifficulty, index: Int): bool {
-            if (index < 0 || index > 4) return false
+            if (index < 0) return false
             // In this case, we 'AND' the number and the message offset to check if the "flag" has been set.
             val offset = 2.toLong() shl (index + BITS_PER_DIFFICULTY * difficulty.ordinal)
             return (currentUserData.dailyMessagesDecrypted and offset) > 0
@@ -397,7 +397,7 @@ class DataManager {
 
         // Updates a message status and returns the resulting mask. TO BE USED IN THE UPDATE TRANSACTION (does not update local data).
         fun PretendSetMessageDecrypted(difficulty: MessageDifficulty, index: Int): Long {
-            if (index < 0 || index > 4) return currentUserData.dailyMessagesDecrypted
+            if (index < 0) return currentUserData.dailyMessagesDecrypted
 
             // Mask individual messages as bits in the larger integer. Just set the "bit" we need.
             // Note that I've not implemented the ability to RESET bits, so be careful with this.

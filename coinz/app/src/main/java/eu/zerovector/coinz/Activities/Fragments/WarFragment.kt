@@ -1,15 +1,15 @@
 package eu.zerovector.coinz.Activities.Fragments
 
 import android.annotation.SuppressLint
+import android.app.AlertDialog
 import android.os.Bundle
 import android.support.v4.app.Fragment
+import android.util.TypedValue
+import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Button
-import android.widget.LinearLayout
-import android.widget.ProgressBar
-import android.widget.TextView
+import android.widget.*
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.DocumentSnapshot
 import com.google.firebase.firestore.EventListener
@@ -150,10 +150,144 @@ class WarFragment : Fragment() {
     }
 
 
+    @SuppressLint("SetTextI18n")
     fun OnBuyComputeClicked() {
-        // todo create an alert dialog with a spinner that allows for the selection of a "Provider" (partly faction-specific).
-        // Providers probably charge a fixed price for a fixed amount of compute provided.
+        if (isDecryptingMessage) return
 
+        isDecryptingMessage = true // "Lock" screen until this is resolved (to avoid any concurrency issues if the user is trying to be "clever")
+
+        val displayGold = DataManager.GetBalance(Currency.GOLD) / 100.0
+        val displayDolr = DataManager.GetBalance(Currency.DOLR) / 100.0
+        val displayPeny = DataManager.GetBalance(Currency.PENY) / 100.0
+        val displayShil = DataManager.GetBalance(Currency.SHIL) / 100.0
+        val displayQuid = DataManager.GetBalance(Currency.QUID) / 100.0
+
+        // Again, I'll be using my favourite strategy of dynamically building alert dialogs.
+        val alert = AlertDialog.Builder(context)
+        alert.setTitle("PURCHASING COMPUTE")
+        alert.setMessage("Select a provider to purchase from. Different providers require different amounts of " +
+                        "different currencies. In addition, your team allows you access to different providers.\n\n" +
+                        "Current bank balances:\nGOLD $displayGold | DOLR $displayDolr | PENY $displayPeny | SHIL $displayShil | QUID $displayQuid")
+
+        val linear = LinearLayout(context)
+        linear.orientation = LinearLayout.VERTICAL
+
+        val curTeam = DataManager.GetTeam()
+        var discountPercent = 0
+        if (curTeam == Team.CrimsonDawn) {
+            discountPercent = Experience.GetLevelCD(DataManager.GetXP()).computeDiscountPercent
+        }
+        val basePriceMultiplier = 1.0 - (discountPercent * 0.01)
+
+        val menu = Spinner(context)
+        //menu.layoutMode = 0 // "dialog" mode for the spinner
+        val availableProviders = mutableListOf<Pair<MessageProvider, Int>>()
+        val menuOptions = mutableListOf<String>()
+        // Add all providers, filtering those that aren't accessible by this particular team.
+        for (i in MessageProvider.values()) {
+            if (curTeam == Team.EleventhEchelon && i.multE11 == 0.0) continue
+            if (curTeam == Team.CrimsonDawn && i.multCD == 0.0) continue
+
+            // Might as well calculate the price here and then just reference it later.
+            val teamMultiplier = if (curTeam == Team.EleventhEchelon) i.multE11 else i.multCD
+            val finalPrice = (i.price * teamMultiplier * basePriceMultiplier).toInt()
+            availableProviders.add(Pair(i, finalPrice))
+            menuOptions.add(i.textName)
+        }
+        menu.adapter = ArrayAdapter<String>(context!!, android.R.layout.simple_spinner_dropdown_item, menuOptions)
+        linear.addView(menu)
+
+        val textPrice = TextView(context)
+        val provider = availableProviders[0].first
+        textPrice.text = "(☄${provider.batchSize} for ${provider.currency} ${availableProviders[0].second})"
+        textPrice.gravity = Gravity.CENTER
+        textPrice.textSize = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP, 9f, context!!.resources.displayMetrics)
+        linear.addView(textPrice)
+
+        val textDesc = TextView(context)
+        textDesc.text = availableProviders[0].first.desc
+        textDesc.gravity = Gravity.CENTER
+        linear.addView(textDesc)
+
+        linear.layoutParams = LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT)
+        linear.setPadding(50, 10, 50, 10)
+
+        // Adding padding on the editText itself makes it bad, so I'm using two layouts within each other to achieve the same result.
+        val mainContainer = LinearLayout(context)
+        mainContainer.layoutParams = LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT)
+        mainContainer.addView(linear)
+        alert.setView(mainContainer)
+
+        // And also handle what happens when the menu selection changes.
+        menu.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
+            override fun onNothingSelected(parent: AdapterView<*>?) {
+                textPrice.text = "..."
+                textDesc.text = "Select provider..."
+            }
+
+            override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
+                val item = availableProviders[position]
+                textPrice.text = "(☄${item.first.batchSize} for ${item.first.currency} ${item.second})"
+                textDesc.text = item.first.desc
+            }
+
+        }
+
+        alert.setPositiveButton("BUY") { _, _ ->
+            // If we don't have the money, cancel:
+            val item = availableProviders[menu.selectedItemPosition]
+            val selectedProvider = item.first
+            val finalPrice = item.second // This is NOT multiplied by 100.
+            val finalPriceTimes100 = finalPrice * 100
+
+            if (DataManager.GetBalance(selectedProvider.currency) < finalPriceTimes100) {
+                MakeToast(context!!, "Insufficient ${selectedProvider.currency} balance in the bank.")
+                isDecryptingMessage = false
+                return@setPositiveButton
+            }
+
+            // If we DO have the balance in the bank, DO IT!
+            val firestore = FirebaseFirestore.getInstance()
+            val curUserID = FirebaseAuth.getInstance().currentUser!!.uid
+            val curUserDoc = firestore.collection("Users").document(curUserID)
+
+            val waitToast = Toast.makeText(context!!, "Making purchase...", Toast.LENGTH_SHORT)
+            waitToast.show()
+
+            firestore.runTransaction { transaction ->
+                // A document must exist for both users, so I can unwrap!! the nullable type
+                val currentAccount = transaction.get(curUserDoc).toObject(AccountData::class.java)!!
+
+                // Increment compute, decrement respective balance.
+                currentAccount.compute += selectedProvider.batchSize
+                when (selectedProvider.currency) {
+                    Currency.GOLD -> currentAccount.balanceGold -= finalPriceTimes100
+                    Currency.DOLR -> currentAccount.balances.dolr -= finalPriceTimes100
+                    Currency.PENY -> currentAccount.balances.peny -= finalPriceTimes100
+                    Currency.SHIL -> currentAccount.balances.shil -= finalPriceTimes100
+                    Currency.QUID -> currentAccount.balances.quid -= finalPriceTimes100
+                }
+                transaction.set(curUserDoc, currentAccount)
+
+                currentAccount
+            }.addOnCompleteListener {
+                waitToast?.cancel()
+                DataManager.SetCurrentAccountData(it.result!!)
+                MakeToast(context!!, "Compute purchased successfully! Do buy again!")
+                UpdateUI()
+                DataManager.TriggerUIUpdates() // this time we'd like the bank balances to update as well
+                isDecryptingMessage = false
+
+            }.addOnFailureListener {
+                waitToast?.cancel()
+                MakeToast(context!!, "Could not make purchase. " + (it.message ?: "An unknown error occurred."))
+                isDecryptingMessage = false
+            }
+        }
+
+        alert.setNegativeButton("CANCEL") { _, _ -> isDecryptingMessage = false }
+
+        alert.show()
     }
 
 
@@ -178,7 +312,8 @@ class WarFragment : Fragment() {
         val curUserDoc = firestore.collection("Users").document(curUserID)
         val warDoc = firestore.collection("War").document("Status")
 
-        MakeToast(context!!, "Decrypting message...")
+        val waitToast = Toast.makeText(context!!, "Decrypting message...", Toast.LENGTH_SHORT)
+        waitToast.show()
 
         isDecryptingMessage = true // "Lock" operations until the transaction succeeds or fails
 
@@ -210,6 +345,7 @@ class WarFragment : Fragment() {
             // All of this should be safe, since transactions are atomic, right?
             Pair(currentAccount, XPBonus)
         }.addOnCompleteListener {
+            waitToast?.cancel()
             val newData = it.result!!.first
             val gainedXP = it.result!!.second
             DataManager.SetCurrentAccountData(newData)
@@ -218,6 +354,7 @@ class WarFragment : Fragment() {
             isDecryptingMessage = false
 
         }.addOnFailureListener {
+            waitToast?.cancel()
             MakeToast(context!!, "Could not decrypt message. " + (it.message ?: "An unknown error occurred."))
             isDecryptingMessage = false
         }
