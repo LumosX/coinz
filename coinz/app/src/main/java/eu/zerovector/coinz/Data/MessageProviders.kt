@@ -15,7 +15,7 @@ enum class MessageProvider(val textName: String, val batchSize: Int, val price: 
     // base 2/p, medium batch
     Europeans("EU INTCEN/ESISC", 250, 50, Currency.QUID, 1.0, 0.0,
             "Purchase some time from the European Union's Intelligence and Situation Centre and the " +
-            "European Strategic Intelligence and Security Center."),
+            "European Strategic Intelligence and Security Centre."),
     // base 2/p, large batch
     Americans("U.S./NATO resources", 600, 120, Currency.DOLR, 1.0, 0.0,
             "The U.S. Pentagon is more than happy to assist us with computing power. They made a pinky-promise " +

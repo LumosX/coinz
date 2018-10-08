@@ -103,6 +103,7 @@ class RegisterActivity : BaseFullscreenActivity(), View.OnTouchListener {
 
         if (error != null) {
             Toast.makeText(applicationContext, error, Toast.LENGTH_SHORT).show()
+            btnConfirmDetails.isEnabled = true
             return
         }
 
@@ -117,72 +118,72 @@ class RegisterActivity : BaseFullscreenActivity(), View.OnTouchListener {
         usersCol.whereEqualTo("username", username)
                 .get()
                 .addOnCompleteListener(object : OnCompleteListener<QuerySnapshot> {
-            override fun onComplete(task: Task<QuerySnapshot>) {
+                    override fun onComplete(task: Task<QuerySnapshot>) {
 
-                // If the username exists, throw an error. Otherwise, attempt to register.
-                if (!task.isSuccessful || task.result.documents.size > 0) {
+                        // If the username exists, throw an error. Otherwise, attempt to register.
+                        if (!task.isSuccessful || task.result.documents.size > 0) {
 
-                    // Fail with the correct error message if it's not working.
-                    val errorMessage = task.exception?.message ?: "Username already exists."
-                    failRegistration(errorMessage)
+                            // Fail with the correct error message if it's not working.
+                            val errorMessage = task.exception?.message ?: "Username already exists."
+                            failRegistration(errorMessage)
 
-                } else {
+                        } else {
 
-                    // Indeed, if ALL data validates, register.
-                    // Callbacks inside callbacks inside callbacks inside callbacks inside ca...
-                    fbAuth
-                            .createUserWithEmailAndPassword(email, pass)
-                            .addOnCompleteListener { task ->
-                                // No matter the result, hide the waiting dialog box.
-                                waitDialog.dismiss()
+                            // Indeed, if ALL data validates, register.
+                            // Callbacks inside callbacks inside callbacks inside callbacks inside ca...
+                            fbAuth
+                                    .createUserWithEmailAndPassword(email, pass)
+                                    .addOnCompleteListener { task ->
+                                        // No matter the result, hide the waiting dialog box.
+                                        waitDialog.dismiss()
 
-                                // If all's well, make a toast.
-                                if (task.isSuccessful) {
+                                        // If all's well, make a toast.
+                                        if (task.isSuccessful) {
 
-                                    // I'd love to move this to the DataManager, but it'd be a pain in the arse, so it's here.
-                                    // Add the new user data to the database, with modified name and team entries
-                                    val user: AccountData = AccountData(username = username, team = team)
+                                            // I'd love to move this to the DataManager, but it'd be a pain in the arse, so it's here.
+                                            // Add the new user data to the database, with modified name and team entries
+                                            val user: AccountData = AccountData(username = username, team = team)
 
-                                    val curUserDoc = firestore.collection("Users").document(fbAuth.currentUser!!.uid)
-                                    curUserDoc.set(user).addOnCompleteListener { innerTask ->
-                                        // Must use this in case of permissions issues.
-                                        if (innerTask.isSuccessful) {
-                                            Toast.makeText(applicationContext, "Registration successful! Loading game...", Toast.LENGTH_SHORT).show()
+                                            val curUserDoc = firestore.collection("Users").document(fbAuth.currentUser!!.uid)
+                                            curUserDoc.set(user).addOnCompleteListener { innerTask ->
+                                                // Must use this in case of permissions issues.
+                                                if (innerTask.isSuccessful) {
+                                                    Toast.makeText(applicationContext, "Registration successful! Loading game...", Toast.LENGTH_SHORT).show()
 
-                                            // "Login" locally
-                                            DataManager.SetCurrentAccountData(user)
+                                                    // "Login" locally
+                                                    DataManager.SetCurrentAccountData(user)
 
-                                            // Move to the new activity as well.
-                                            finish()
-                                            startActivity(Intent(this@RegisterActivity, GameActivity::class.java))
-                                            btnConfirmDetails.isEnabled = true
+                                                    // Move to the new activity as well.
+                                                    finish()
+                                                    startActivity(Intent(this@RegisterActivity, GameActivity::class.java))
+                                                    btnConfirmDetails.isEnabled = true
+                                                } else {
+                                                    failRegistration(innerTask.exception?.message!!)
+                                                }
+                                            }
+
+
                                         } else {
-                                            failRegistration(innerTask.exception?.message!!)
+                                            failRegistration(task.exception?.message!!)
                                         }
                                     }
 
 
-                                } else {
-                                    failRegistration(task.exception?.message!!)
-                                }
-                            }
+                        }
+                    }
 
+                    // and because this is essentially java-like, we can hack this cheeky function in the listener.
+                    fun failRegistration(innerError: String) {
+                        waitDialog.dismiss()
+                        dialogBuilder = AlertDialog.Builder(this@RegisterActivity)
+                                .setMessage("Registration failed!\n$innerError")
+                                .setNeutralButton("Close", null)
+                        val failureDialog = dialogBuilder.create()
+                        failureDialog.show()
+                        btnConfirmDetails.isEnabled = true
+                    }
 
-                }
-            }
-
-            // and because this is essentially java-like, we can hack this cheeky function in the listener.
-            fun failRegistration(innerError: String) {
-                waitDialog.dismiss()
-                dialogBuilder = AlertDialog.Builder(this@RegisterActivity)
-                        .setMessage("Registration failed!\n$innerError")
-                        .setNeutralButton("Close", null)
-                val failureDialog = dialogBuilder.create()
-                failureDialog.show()
-                btnConfirmDetails.isEnabled = true
-            }
-
-        })
+                })
 
 
     }

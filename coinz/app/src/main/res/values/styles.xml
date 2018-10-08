@@ -35,6 +35,7 @@
         <item name="android:textColor">@color/darkGrey</item>
         <item name="android:backgroundTint">@color/basicGrey</item>
         <item name="android:textColorHint">@color/darkGrey</item>
+        <item name="android:windowSoftInputMode">adjustPan</item>
     </style>
 
 </resources>

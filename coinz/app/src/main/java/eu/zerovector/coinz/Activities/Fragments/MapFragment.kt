@@ -29,9 +29,9 @@ import com.mapbox.mapboxsdk.style.sources.GeoJsonSource
 import eu.zerovector.coinz.Data.Currency
 import eu.zerovector.coinz.Data.DataManager
 import eu.zerovector.coinz.Data.bool
+import eu.zerovector.coinz.R
 import eu.zerovector.coinz.Utils.Companion.DrawRadiusPolygon
 import eu.zerovector.coinz.Utils.Companion.GenerateCoinIcon
-import eu.zerovector.coinz.R
 
 
 
@@ -193,8 +193,8 @@ class MapFragment : Fragment(), OnMapReadyCallback, LocationEngineListener {
     private fun enableLocationEvents() {
         // Get the LocationEngine running first.
         locationEngine = LocationEngineProvider(context).obtainBestLocationEngineAvailable()
-        // TODO: WORK AROUND MAPBOX BUG https://github.com/mapbox/mapbox-navigation-android/issues/1121
-        locationEngine?.priority = LocationEnginePriority.HIGH_ACCURACY
+        // TODO: WORK AROUND MAPBOX BUG https://github.com/mapbox/mapbox-navigation-android/issues/1121 It seems to currently be impossible.
+        locationEngine?.priority = LocationEnginePriority.BALANCED_POWER_ACCURACY
         locationEngine?.fastestInterval = 1000
         locationEngine?.addLocationEngineListener(this)
         locationEngine?.activate()
