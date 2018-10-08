@@ -1,16 +1,8 @@
 package eu.zerovector.coinz.Activities
 
-import android.app.AlertDialog
 import android.content.Intent
 import android.os.Bundle
 import android.view.View
-import com.google.android.gms.tasks.OnCompleteListener
-import com.google.android.gms.tasks.Task
-import com.google.firebase.auth.AuthResult
-import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.firestore.FirebaseFirestore
-import eu.zerovector.coinz.Data.AccountData
-import eu.zerovector.coinz.Data.DataManager
 import eu.zerovector.coinz.R
 import kotlinx.android.synthetic.main.activity_main_menu.*
 
@@ -58,7 +50,7 @@ class MainMenuActivity : BaseFullscreenActivity() {
     // DELETE THIS ONCE DONE
     fun onTestLoginClicked(view: View) {
 
-        // If the data validates, register.
+        /*// If the data validates, register.
         var dialogBuilder = AlertDialog.Builder(this@MainMenuActivity)
                 .setMessage("Signing in... Please wait.")
         val waitDialog = dialogBuilder.create()
@@ -89,6 +81,7 @@ class MainMenuActivity : BaseFullscreenActivity() {
 
                                     // Then we just need to move to the new activity.
                                     //finish()
+                                    Utils.MakeToast(this@MainMenuActivity, "Loading game data...", false)
                                     startActivity(Intent(this@MainMenuActivity, GameActivity::class.java))
                                 }
                             }
@@ -108,7 +101,7 @@ class MainMenuActivity : BaseFullscreenActivity() {
                         val failureDialog = dialogBuilder.create()
                         failureDialog.show()
                     }
-                })
+                })*/
     }
 
 

@@ -12,6 +12,7 @@ import com.google.firebase.firestore.FirebaseFirestore
 import eu.zerovector.coinz.Data.AccountData
 import eu.zerovector.coinz.Data.DataManager
 import eu.zerovector.coinz.R
+import eu.zerovector.coinz.Utils.Companion.MakeToast
 import kotlinx.android.synthetic.main.activity_register.*
 
 
@@ -61,6 +62,7 @@ class LoginActivity : BaseFullscreenActivity() {
                                     DataManager.SetCurrentAccountData(userData!!)
 
                                     // Then we just need to move to the new activity.
+                                    MakeToast(this@LoginActivity, "Loading game data...", false)
                                     finish()
                                     startActivity(Intent(this@LoginActivity, GameActivity::class.java))
                                 }

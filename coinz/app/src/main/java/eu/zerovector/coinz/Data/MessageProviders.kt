@@ -51,9 +51,9 @@ enum class MessageProvider(val textName: String, val batchSize: Int, val price: 
             "who exactly runs all of those machines, but the source should be safe and untraceable. Probably. Hopefully."),
     // base price 1/p, medium batch, 1.0x E11, 1.15x CD
     Russians("Russian supercomputers", 400, 40, Currency.DOLR, 1.0, 1.15,
-            "Accuse them of whatever you want, but you still have to admit that the Russians are at the forefront " +
-            "of computing power. In addition, no matter how bad everyone wants them to look, obtaining compute from them " +
-            "is far more difficult if you're not a legitimate agency. How interesting, isn't it?..."),
+            "As usual, the Russians are at the forefront of supercomputing technology, and they're always willing to lend " +
+            "a hand to their British allies. Whilst is is possible for shadowy organisations to acquire access too, that is " +
+            "significantly more expensive."),
 
 
 }
