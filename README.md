@@ -6,11 +6,7 @@ Repository for the Informatics Large Practical 2018/19 course.
 
 
 ### Game features:
-<<<<<<< HEAD
 (**Note:** Features in *italics* denote specification-requested features. All others are to be considered bonus features.)
-
-=======
->>>>>>> 35e3a530e240975ce17d8b2b28d3e9e22fe7c8e2
 * *Coins of the four fictional cryptocurrencies may be collected by walking within range.*
 * *Collected coins are added to the respective "spare change" wallet balance.*
 * *Coins from the "spare change" wallets may be deposited to the player's bank account.*
@@ -32,12 +28,6 @@ Repository for the Informatics Large Practical 2018/19 course.
 * The second team, the "Crimson Dawn", is a fictional group of high-tech mercenaries seeking to find the bomb and sell it to an unnamed buyer for a lot of money.
 * The two teams feature distinct colour schemes: silver and black for the Eleventh Echelon, and crimson and black for the Crimson Dawn. The rest of the game's interface thematically fits, largely occupied by various shades of grey.
 
-<<<<<<< HEAD
-=======
-
-Features in *italics* denote specification-requested features. All others are to be considered bonus features.
-
->>>>>>> 35e3a530e240975ce17d8b2b28d3e9e22fe7c8e2
 &nbsp;
 ### Repo structure
 The **assets/*** folder contains the Photoshop source files for all drawables.  
