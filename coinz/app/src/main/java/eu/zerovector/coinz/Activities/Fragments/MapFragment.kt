@@ -14,6 +14,8 @@ import com.mapbox.android.core.location.LocationEngine
 import com.mapbox.android.core.location.LocationEngineListener
 import com.mapbox.android.core.location.LocationEnginePriority
 import com.mapbox.android.core.location.LocationEngineProvider
+import com.mapbox.android.core.permissions.PermissionsListener
+import com.mapbox.android.core.permissions.PermissionsManager
 import com.mapbox.mapboxsdk.Mapbox
 import com.mapbox.mapboxsdk.annotations.*
 import com.mapbox.mapboxsdk.geometry.LatLng
@@ -30,16 +32,20 @@ import eu.zerovector.coinz.Data.Currency
 import eu.zerovector.coinz.Data.DataManager
 import eu.zerovector.coinz.Data.bool
 import eu.zerovector.coinz.R
+import eu.zerovector.coinz.Utils
 import eu.zerovector.coinz.Utils.Companion.DrawRadiusPolygon
 import eu.zerovector.coinz.Utils.Companion.GenerateCoinIcon
+import eu.zerovector.coinz.Utils.Companion.MakeToast
 
 
-
-class MapFragment : Fragment(), OnMapReadyCallback, LocationEngineListener {
+class MapFragment : Fragment(), OnMapReadyCallback, LocationEngineListener, PermissionsListener {
 
     private lateinit var mapView: MapView
     private lateinit var mapboxMap: MapboxMap
     private var locationEngine: LocationEngine? = null
+    private var locationLayerPlugin: LocationLayerPlugin? = null
+    private lateinit var permissionsManager: PermissionsManager
+    private var originLocation: Location? = null
     private var grabRadiusPoly: Polygon? = null
     private var coinMarkers: MutableList<Marker> = mutableListOf()
 
@@ -102,7 +108,8 @@ class MapFragment : Fragment(), OnMapReadyCallback, LocationEngineListener {
         this.mapboxMap = mapboxMap
 
         // Permissions are handled elsewhere and should be available
-        enableLocationEvents()
+//        enableLocationEvents()
+        enableLocationPlugin()
 
         // Now show bounds and restrict map
         showBoundsArea()
@@ -126,6 +133,94 @@ class MapFragment : Fragment(), OnMapReadyCallback, LocationEngineListener {
 
 
     }
+
+
+    private fun checkRequestLocPermissions() {
+        //Toast.makeText(this, "MAP READY TRIGGERED", Toast.LENGTH_SHORT).show()
+        // Check if permissions are enabled and if not request
+        if (!PermissionsManager.areLocationPermissionsGranted(context)) {
+            permissionsManager = PermissionsManager(this)
+            permissionsManager.requestLocationPermissions(activity)
+        }
+    }
+
+    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<String>, grantResults: IntArray) {
+        permissionsManager.onRequestPermissionsResult(requestCode, permissions, grantResults)
+    }
+
+    override fun onExplanationNeeded(permissionsToExplain: List<String>) {
+        Utils.MakeToast(context!!, "The game cannot be played without this permissions.", false)
+    }
+
+    override fun onPermissionResult(granted: Boolean) {
+        if (granted) {
+            enableLocationPlugin()
+        } else {
+            Utils.MakeToast(context!!, "The game can't function without the requested permissions.", false)
+            activity?.finish()
+        }
+    }
+
+
+    private fun enableLocationPlugin() {
+        // Check if permissions are enabled and if not request
+        if (PermissionsManager.areLocationPermissionsGranted(context)) {
+            MakeToast(context!!, "WE HAVE PERMISSIONS")
+
+
+            initializeLocationEngine()
+            // Create an instance of the plugin. Adding in LocationLayerOptions is also an optional parameter
+            locationLayerPlugin = LocationLayerPlugin(mapView, mapboxMap)
+
+            // Set the plugin's camera mode
+            locationLayerPlugin?.cameraMode = CameraMode.TRACKING
+            lifecycle.addObserver(locationLayerPlugin!!)
+        } else {
+            permissionsManager = PermissionsManager(this)
+            permissionsManager.requestLocationPermissions(activity)
+        }
+    }
+
+    @SuppressLint("MissingPermission")
+    private fun initializeLocationEngine() {
+        val locationEngineProvider = LocationEngineProvider(context)
+        locationEngine = locationEngineProvider.obtainBestLocationEngineAvailable()
+        locationEngine?.priority = LocationEnginePriority.HIGH_ACCURACY
+
+        locationEngine?.fastestInterval = 1000
+        locationEngine?.addLocationEngineListener(this)
+
+        locationEngine?.activate()
+
+
+        val lastLocation = locationEngine?.lastLocation
+        if (lastLocation != null) {
+            originLocation = lastLocation
+        }
+        /*else {
+            locationEngine?.addLocationEngineListener(this)
+        }*/
+    }
+
+
+    /*   private fun enableLocationEvents() {
+           // Get the LocationEngine running first.
+           locationEngine = LocationEngineProvider(context).obtainBestLocationEngineAvailable()
+           // TODO: WORK AROUND MAPBOX BUG https://github.com/mapbox/mapbox-navigation-android/issues/1121 It seems to currently be impossible.
+           locationEngine?.priority = LocationEnginePriority.HIGH_ACCURACY
+           locationEngine?.fastestInterval = 1000
+           locationEngine?.addLocationEngineListener(this)
+           locationEngine?.activate()
+
+           // Create an instance of the plugin. Adding in LocationLayerOptions is also an optional parameter
+           val locationLayerPlugin = LocationLayerPlugin(mapView, mapboxMap)
+           // also enable location tracking
+           locationLayerPlugin.isLocationLayerEnabled = true
+           locationLayerPlugin.cameraMode = CameraMode.TRACKING
+           lifecycle.addObserver(locationLayerPlugin)
+       }
+   */
+
 
     private fun CurrencyToIcon(currency: Currency) = when (currency) {
         Currency.DOLR -> iconDolr
@@ -180,31 +275,13 @@ class MapFragment : Fragment(), OnMapReadyCallback, LocationEngineListener {
         boundsPolygon.fillColor(Color.RED)
         mapboxMap.addPolygon(boundsPolygon)
 
-       /* // The giant red box didn't look very good, so I made it very faint (10% opacity), and added a noticeable "border line" as well.
-        val boundsLine = PolylineOptions()
-                .addAll(listOf(bounds.northWest, bounds.northEast, bounds.southEast, bounds.southWest, bounds.northWest))
-        boundsLine.alpha(0.85f)
-        boundsLine.color(Color.RED)
-        boundsLine.width(4f)
-        mapboxMap.addPolyline(boundsLine)*/
-    }
-
-
-    private fun enableLocationEvents() {
-        // Get the LocationEngine running first.
-        locationEngine = LocationEngineProvider(context).obtainBestLocationEngineAvailable()
-        // TODO: WORK AROUND MAPBOX BUG https://github.com/mapbox/mapbox-navigation-android/issues/1121 It seems to currently be impossible.
-        locationEngine?.priority = LocationEnginePriority.BALANCED_POWER_ACCURACY
-        locationEngine?.fastestInterval = 1000
-        locationEngine?.addLocationEngineListener(this)
-        locationEngine?.activate()
-
-        // Create an instance of the plugin. Adding in LocationLayerOptions is also an optional parameter
-        val locationLayerPlugin = LocationLayerPlugin(mapView, mapboxMap)
-        // also enable location tracking
-        locationLayerPlugin.isLocationLayerEnabled = true
-        locationLayerPlugin.cameraMode = CameraMode.TRACKING
-        lifecycle.addObserver(locationLayerPlugin)
+        /* // The giant red box didn't look very good, so I made it very faint (10% opacity), and added a noticeable "border line" as well.
+         val boundsLine = PolylineOptions()
+                 .addAll(listOf(bounds.northWest, bounds.northEast, bounds.southEast, bounds.southWest, bounds.northWest))
+         boundsLine.alpha(0.85f)
+         boundsLine.color(Color.RED)
+         boundsLine.width(4f)
+         mapboxMap.addPolyline(boundsLine)*/
     }
 
     @SuppressLint("MissingPermission")
@@ -243,10 +320,6 @@ class MapFragment : Fragment(), OnMapReadyCallback, LocationEngineListener {
     }
 
 
-
-
-
-
     @SuppressLint("SetTextI18n")
     private fun UpdateCoinLabels() {
         val walletSize = DataManager.GetWalletSize() / 100.0
@@ -257,18 +330,20 @@ class MapFragment : Fragment(), OnMapReadyCallback, LocationEngineListener {
     }
 
 
-
     @SuppressLint("MissingPermission")
     override fun onStart() {
         super.onStart()
         mapView.onStart()
-        if (locationEngine != null) {
+        /*if (locationEngine != null) {
             locationEngine?.addLocationEngineListener(this)
             if (locationEngine!!.isConnected) {
                 locationEngine?.requestLocationUpdates()
             } else {
                 locationEngine?.activate()
             }
+        }*/
+        if (locationLayerPlugin != null) {
+            locationLayerPlugin?.onStart()
         }
     }
 
@@ -285,9 +360,12 @@ class MapFragment : Fragment(), OnMapReadyCallback, LocationEngineListener {
     override fun onStop() {
         super.onStop()
         mapView.onStop()
-        if (locationEngine != null) {
+        /*if (locationEngine != null) {
             locationEngine?.removeLocationEngineListener(this)
             locationEngine?.removeLocationUpdates()
+        }*/
+        if (locationLayerPlugin != null) {
+            locationLayerPlugin?.onStop()
         }
     }
 

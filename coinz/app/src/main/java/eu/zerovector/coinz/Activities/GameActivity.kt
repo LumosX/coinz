@@ -4,10 +4,7 @@ import android.app.AlertDialog
 import android.content.Context
 import android.os.Bundle
 import android.view.MotionEvent
-import android.widget.Toast
 import com.google.firebase.auth.FirebaseAuth
-import com.mapbox.android.core.permissions.PermissionsListener
-import com.mapbox.android.core.permissions.PermissionsManager
 import com.ogaclejapan.smarttablayout.utils.v4.FragmentPagerItemAdapter
 import com.ogaclejapan.smarttablayout.utils.v4.FragmentPagerItems
 import eu.zerovector.coinz.Activities.Fragments.*
@@ -20,11 +17,11 @@ import eu.zerovector.coinz.Utils.Companion.MakeToast
 import kotlinx.android.synthetic.main.activity_game.*
 
 
-class GameActivity : BaseFullscreenActivity(), PermissionsListener {
+
+
+class GameActivity : BaseFullscreenActivity() {
 
     private lateinit var fbAuth: FirebaseAuth
-    private lateinit var permissionsManager: PermissionsManager
-
     override fun onCreate(savedInstanceState: Bundle?) {
 
         super.onCreate(savedInstanceState)
@@ -48,7 +45,7 @@ class GameActivity : BaseFullscreenActivity(), PermissionsListener {
         viewPager.setOnTouchListener { v, event -> (event?.action == MotionEvent.ACTION_MOVE) }
 
         // Also request map permissions RIGHT NOW
-        checkRequestLocPermissions()
+        //checkRequestLocPermissions()
 
         // Immediately start downloading map data.
         DataManager.UpdateLocalMap(baseContext)
@@ -60,34 +57,6 @@ class GameActivity : BaseFullscreenActivity(), PermissionsListener {
 
         //MakeToast(this, "precheck first run")
         checkFirstRun()
-    }
-
-
-    private fun checkRequestLocPermissions() {
-        //Toast.makeText(this, "MAP READY TIGGERED", Toast.LENGTH_SHORT).show()
-        // Check if permissions are enabled and if not request
-        if (!PermissionsManager.areLocationPermissionsGranted(this)) {
-            permissionsManager = PermissionsManager(this)
-            permissionsManager.requestLocationPermissions(this)
-        }
-    }
-
-
-    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<String>, grantResults: IntArray) {
-        permissionsManager.onRequestPermissionsResult(requestCode, permissions, grantResults)
-    }
-
-    override fun onExplanationNeeded(permissionsToExplain: List<String>) {
-        //Toast.makeText(this, "The game cannot be played without this permission", Toast.LENGTH_LONG).show()
-    }
-
-    override fun onPermissionResult(granted: Boolean) {
-        if (granted) {
-            checkRequestLocPermissions()
-        } else {
-            Toast.makeText(this, "The game can't function without the requested permission.", Toast.LENGTH_LONG).show()
-            finish()
-        }
     }
 
 
@@ -129,7 +98,7 @@ class GameActivity : BaseFullscreenActivity(), PermissionsListener {
     private fun ShowMapTabTutorial() {
         viewPager.currentItem = 0
         val alert = AlertDialog.Builder(this)
-        alert.setTitle("MAP SCREEN")
+        alert.setTitle("MAP SCREEN (1/5)")
         alert.setMessage("Your mission in the game is to walk around the map and pick \"coins\" up. This is the Map screen, " +
                 "which displays your location, the location of all coins you can pick up, and the radius of your reach.\n" +
                 "You can tap on every individual coin marker to check its value. To collect a coin, simply walk approach its location, " +
@@ -146,7 +115,7 @@ class GameActivity : BaseFullscreenActivity(), PermissionsListener {
         viewPager.currentItem = 1
         val isE11 = DataManager.GetTeam() == Team.EleventhEchelon
         val alert = AlertDialog.Builder(this)
-        alert.setTitle("BANK SCREEN")
+        alert.setTitle("BANK SCREEN (2/5)")
         alert.setMessage("This is the Bank screen, which lists all of your currency balances, as well as your \"spare change\": the coins " +
                 "in your wallet.\nYou can buy and sell currencies from here, deposit your \"spare change\" into your bank account, and " +
                 "send extra \"spare change\" to teammates.\n" +
@@ -165,7 +134,7 @@ class GameActivity : BaseFullscreenActivity(), PermissionsListener {
         viewPager.currentItem = 2
         val isE11 = DataManager.GetTeam() == Team.EleventhEchelon
         val alert = AlertDialog.Builder(this)
-        alert.setTitle("OPERATIONS SCREEN")
+        alert.setTitle("OPERATIONS SCREEN (3/5)")
         alert.setMessage("This is the Operations screen, which shows you the current global status of the operation, the amount of computing " +
                 "power (\"Compute\") at your disposal, and the list of encrypted messages available to you to decrypt today.\n" +
                 "Both your team and the " +
@@ -187,7 +156,7 @@ class GameActivity : BaseFullscreenActivity(), PermissionsListener {
         viewPager.currentItem = 3
         val isE11 = DataManager.GetTeam() == Team.EleventhEchelon
         val alert = AlertDialog.Builder(this)
-        alert.setTitle("STATS SCREEN")
+        alert.setTitle("STATS SCREEN (4/5)")
         alert.setMessage("This is the Stats screen, which shows the daily currency rates, your current level, experience, and " +
                 "bonuses you get at your current and next level.\n" +
                 "In addition, you may choose to show this tutorial again next time by pressing the button at the bottom of the screen.\n" +
@@ -204,7 +173,7 @@ class GameActivity : BaseFullscreenActivity(), PermissionsListener {
         viewPager.currentItem = 4
         val isE11 = DataManager.GetTeam() == Team.EleventhEchelon
         val alert = AlertDialog.Builder(this)
-        alert.setTitle("OPERATIONS SCREEN")
+        alert.setTitle("MAIL SCREEN (5/5)")
         alert.setMessage("This is the Mail screen, which lists your messages. Whenever someone sends you coins, the transaction will be recorded " +
                 "here. Furthermore, your team's commander has sent you a message to introduce you to more details of the operation. " +
                 "You might want to read that...\n\nThis is the end of the tutorial. Good luck!")
