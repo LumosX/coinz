@@ -220,7 +220,7 @@ class GameActivity : BaseFullscreenActivity(), PermissionsListener {
     override fun onBackPressed() {
         // Handle double-tap-to-exit functionality
         if (lastTimeBackPressed + 1000 < System.currentTimeMillis()) {
-            MakeToast(applicationContext, "Tap \"Back\" again to exit game.", false)
+            MakeToast(applicationContext, "Double-tap \"Back\" quickly to log out.", false)
             lastTimeBackPressed = System.currentTimeMillis()
             return
         }
