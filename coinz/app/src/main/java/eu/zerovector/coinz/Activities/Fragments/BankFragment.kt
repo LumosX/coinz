@@ -218,7 +218,7 @@ class BankFragment : Fragment() {
                         override fun onComplete(task: Task<QuerySnapshot>) {
 
                             // If the username doesn't exist, we can't send anything.
-                            if (!task.isSuccessful || task.result.documents.size == 0) {
+                            if (!task.isSuccessful || task.result!!.documents.size == 0) {
                                 val errorMessage = task.exception?.message
                                         ?: "Recipient username doesn't exist or recipient not on the same team."
                                 failTransaction(errorMessage)
@@ -226,7 +226,7 @@ class BankFragment : Fragment() {
                             // Otherwise, however, DO send the cash.
                             else {
                                 // pretty sure that this is safe, as we've already checked whether a doc exists.
-                                makeTransaction(task.result.documents[0].id)
+                                makeTransaction(task.result!!.documents[0].id)
                             }
                         }
 

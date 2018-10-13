@@ -121,7 +121,7 @@ class RegisterActivity : BaseFullscreenActivity(), View.OnTouchListener {
                     override fun onComplete(task: Task<QuerySnapshot>) {
 
                         // If the username exists, throw an error. Otherwise, attempt to register.
-                        if (!task.isSuccessful || task.result.documents.size > 0) {
+                        if (!task.isSuccessful || task.result!!.documents.size > 0) {
 
                             // Fail with the correct error message if it's not working.
                             val errorMessage = task.exception?.message ?: "Username already exists."

@@ -143,7 +143,7 @@ class DataManager {
                 } else {
                     val coinsTaken = mutableListOf<String>()
                     // Get all field names from the collection. They are actually the coin IDs we need.
-                    task.result.data?.entries?.mapTo(coinsTaken) { it.key }
+                    task.result!!.data?.entries?.mapTo(coinsTaken) { it.key }
 
                     currentCoinsMap.clear()
                     for (coin in data.features) {
