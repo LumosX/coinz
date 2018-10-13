@@ -129,7 +129,7 @@ class GameActivity : BaseFullscreenActivity(), PermissionsListener {
     private fun ShowMapTabTutorial() {
         viewPager.currentItem = 0
         val alert = AlertDialog.Builder(this)
-        alert.setTitle("MAP SCREEN")
+        alert.setTitle("MAP SCREEN (1/5)")
         alert.setMessage("Your mission in the game is to walk around the map and pick \"coins\" up. This is the Map screen, " +
                 "which displays your location, the location of all coins you can pick up, and the radius of your reach.\n" +
                 "You can tap on every individual coin marker to check its value. To collect a coin, simply walk approach its location, " +
@@ -146,7 +146,7 @@ class GameActivity : BaseFullscreenActivity(), PermissionsListener {
         viewPager.currentItem = 1
         val isE11 = DataManager.GetTeam() == Team.EleventhEchelon
         val alert = AlertDialog.Builder(this)
-        alert.setTitle("BANK SCREEN")
+        alert.setTitle("BANK SCREEN (2/5)")
         alert.setMessage("This is the Bank screen, which lists all of your currency balances, as well as your \"spare change\": the coins " +
                 "in your wallet.\nYou can buy and sell currencies from here, deposit your \"spare change\" into your bank account, and " +
                 "send extra \"spare change\" to teammates.\n" +
@@ -165,7 +165,7 @@ class GameActivity : BaseFullscreenActivity(), PermissionsListener {
         viewPager.currentItem = 2
         val isE11 = DataManager.GetTeam() == Team.EleventhEchelon
         val alert = AlertDialog.Builder(this)
-        alert.setTitle("OPERATIONS SCREEN")
+        alert.setTitle("OPERATIONS SCREEN (3/5)")
         alert.setMessage("This is the Operations screen, which shows you the current global status of the operation, the amount of computing " +
                 "power (\"Compute\") at your disposal, and the list of encrypted messages available to you to decrypt today.\n" +
                 "Both your team and the " +
@@ -187,7 +187,7 @@ class GameActivity : BaseFullscreenActivity(), PermissionsListener {
         viewPager.currentItem = 3
         val isE11 = DataManager.GetTeam() == Team.EleventhEchelon
         val alert = AlertDialog.Builder(this)
-        alert.setTitle("STATS SCREEN")
+        alert.setTitle("STATS SCREEN (4/5)")
         alert.setMessage("This is the Stats screen, which shows the daily currency rates, your current level, experience, and " +
                 "bonuses you get at your current and next level.\n" +
                 "In addition, you may choose to show this tutorial again next time by pressing the button at the bottom of the screen.\n" +
@@ -204,7 +204,7 @@ class GameActivity : BaseFullscreenActivity(), PermissionsListener {
         viewPager.currentItem = 4
         val isE11 = DataManager.GetTeam() == Team.EleventhEchelon
         val alert = AlertDialog.Builder(this)
-        alert.setTitle("OPERATIONS SCREEN")
+        alert.setTitle("OPERATIONS SCREEN (5/5)")
         alert.setMessage("This is the Mail screen, which lists your messages. Whenever someone sends you coins, the transaction will be recorded " +
                 "here. Furthermore, your team's commander has sent you a message to introduce you to more details of the operation. " +
                 "You might want to read that...\n\nThis is the end of the tutorial. Good luck!")
@@ -221,8 +221,10 @@ class GameActivity : BaseFullscreenActivity(), PermissionsListener {
         // Handle double-tap-to-exit functionality
         if (lastTimeBackPressed + 1000 < System.currentTimeMillis()) {
             MakeToast(applicationContext, "Tap \"Back\" again to exit game.", false)
+            lastTimeBackPressed = System.currentTimeMillis()
+            return
         }
-        lastTimeBackPressed = System.currentTimeMillis()
+
 
         super.onBackPressed()
         // This should always work fine, because we don't allow access to this activity if the user isn't signed in yet
