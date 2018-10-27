@@ -6,6 +6,7 @@ import android.location.Location
 import android.os.Bundle
 import android.support.v4.app.Fragment
 import android.support.v4.content.ContextCompat
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -286,12 +287,14 @@ class MapFragment : Fragment(), OnMapReadyCallback, LocationEngineListener, Perm
 
     @SuppressLint("MissingPermission")
     override fun onConnected() {
-        locationEngine?.requestLocationUpdates()
+        locationEngine!!.requestLocationUpdates()
+        Log.d("AYYY", "onconnected triggered.")
     }
 
 
     // The main attraction: grabbing coins within range.
     override fun onLocationChanged(location: Location?) {
+        Log.d("AYYY", "onlocationchanged triggered: $location")
         if (location == null) return
 
         val grabRadius = DataManager.GetGrabRadiusInMetres()

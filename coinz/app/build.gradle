@@ -55,6 +55,7 @@ dependencies {
     implementation 'com.ogaclejapan.smarttablayout:library:1.6.1@aar'
     implementation 'com.ogaclejapan.smarttablayout:utils-v4:1.6.1@aar'
 
+    api 'com.google.android.gms:play-services-location:16.0.0'
     implementation 'com.mapbox.mapboxsdk:mapbox-android-sdk:6.5.0'
     implementation 'com.mapbox.mapboxsdk:mapbox-android-plugin-locationlayer:0.10.0'
 
@@ -68,5 +69,6 @@ dependencies {
 }
 
 apply plugin: 'com.google.gms.google-services'
+
 //apply plugin: 'kotlin-kapt'
 

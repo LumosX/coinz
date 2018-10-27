@@ -4,7 +4,10 @@ import android.app.AlertDialog
 import android.content.Context
 import android.os.Bundle
 import android.view.MotionEvent
+import android.widget.Toast
 import com.google.firebase.auth.FirebaseAuth
+import com.mapbox.android.core.permissions.PermissionsListener
+import com.mapbox.android.core.permissions.PermissionsManager
 import com.ogaclejapan.smarttablayout.utils.v4.FragmentPagerItemAdapter
 import com.ogaclejapan.smarttablayout.utils.v4.FragmentPagerItems
 import eu.zerovector.coinz.Activities.Fragments.*
@@ -17,11 +20,11 @@ import eu.zerovector.coinz.Utils.Companion.MakeToast
 import kotlinx.android.synthetic.main.activity_game.*
 
 
-
-
-class GameActivity : BaseFullscreenActivity() {
+class GameActivity : BaseFullscreenActivity(), PermissionsListener {
 
     private lateinit var fbAuth: FirebaseAuth
+    private lateinit var permissionsManager: PermissionsManager
+
     override fun onCreate(savedInstanceState: Bundle?) {
 
         super.onCreate(savedInstanceState)
@@ -45,7 +48,7 @@ class GameActivity : BaseFullscreenActivity() {
         viewPager.setOnTouchListener { v, event -> (event?.action == MotionEvent.ACTION_MOVE) }
 
         // Also request map permissions RIGHT NOW
-        //checkRequestLocPermissions()
+        checkRequestLocPermissions()
 
         // Immediately start downloading map data.
         DataManager.UpdateLocalMap(baseContext)
@@ -57,6 +60,34 @@ class GameActivity : BaseFullscreenActivity() {
 
         //MakeToast(this, "precheck first run")
         checkFirstRun()
+    }
+
+
+    private fun checkRequestLocPermissions() {
+        //Toast.makeText(this, "MAP READY TIGGERED", Toast.LENGTH_SHORT).show()
+        // Check if permissions are enabled and if not request
+        if (!PermissionsManager.areLocationPermissionsGranted(this)) {
+            permissionsManager = PermissionsManager(this)
+            permissionsManager.requestLocationPermissions(this)
+        }
+    }
+
+
+    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<String>, grantResults: IntArray) {
+        permissionsManager.onRequestPermissionsResult(requestCode, permissions, grantResults)
+    }
+
+    override fun onExplanationNeeded(permissionsToExplain: List<String>) {
+        //Toast.makeText(this, "The game cannot be played without this permission", Toast.LENGTH_LONG).show()
+    }
+
+    override fun onPermissionResult(granted: Boolean) {
+        if (granted) {
+            checkRequestLocPermissions()
+        } else {
+            Toast.makeText(this, "The game can't function without the requested permission.", Toast.LENGTH_LONG).show()
+            finish()
+        }
     }
 
 
@@ -173,7 +204,7 @@ class GameActivity : BaseFullscreenActivity() {
         viewPager.currentItem = 4
         val isE11 = DataManager.GetTeam() == Team.EleventhEchelon
         val alert = AlertDialog.Builder(this)
-        alert.setTitle("MAIL SCREEN (5/5)")
+        alert.setTitle("OPERATIONS SCREEN (5/5)")
         alert.setMessage("This is the Mail screen, which lists your messages. Whenever someone sends you coins, the transaction will be recorded " +
                 "here. Furthermore, your team's commander has sent you a message to introduce you to more details of the operation. " +
                 "You might want to read that...\n\nThis is the end of the tutorial. Good luck!")
@@ -189,9 +220,11 @@ class GameActivity : BaseFullscreenActivity() {
     override fun onBackPressed() {
         // Handle double-tap-to-exit functionality
         if (lastTimeBackPressed + 1000 < System.currentTimeMillis()) {
-            MakeToast(applicationContext, "Tap \"Back\" again to exit game.", false)
+            MakeToast(applicationContext, "Double-tap \"Back\" quickly to log out.", false)
+            lastTimeBackPressed = System.currentTimeMillis()
+            return
         }
-        lastTimeBackPressed = System.currentTimeMillis()
+
 
         super.onBackPressed()
         // This should always work fine, because we don't allow access to this activity if the user isn't signed in yet
