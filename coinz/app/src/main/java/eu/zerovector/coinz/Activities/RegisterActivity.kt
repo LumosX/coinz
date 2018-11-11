@@ -94,13 +94,7 @@ class RegisterActivity : BaseFullscreenActivity(), View.OnTouchListener {
 
         // Validate data.
         // username must be 3+ chars.
-        var error: String? = null
-        if (!email.matches("^[A-Za-z](.*)([@])(.+)(\\.)(.+)".toRegex())) error = "Email is not valid!"
-        else if (pass.length < 6) error = "Password too short (must be 6+ chars)!"
-        else if (!pass.contains(".*\\d+.*".toRegex())) error = "Password must contain a digit!"
-        else if (pass != confirmPass) error = "Passwords don't match!"
-        else if (username.length < 3) error = "Username too short (must be 3+ chars)!"
-
+        val error = ValidateUserData(email, username, pass, confirmPass)
         if (error != null) {
             Toast.makeText(applicationContext, error, Toast.LENGTH_SHORT).show()
             btnConfirmDetails.isEnabled = true
@@ -225,6 +219,18 @@ class RegisterActivity : BaseFullscreenActivity(), View.OnTouchListener {
         activatedLayout.alpha = 0.0f
         activatedLayout.animate().alpha(1.0f).duration = 1000
         deactivatedLayout.animate().alpha(0.0f).setDuration(1000).withEndAction { deactivatedLayout.visibility = View.INVISIBLE }
+    }
+
+    companion object {
+        fun ValidateUserData(email: String, username: String, pass: String, confirmPass: String): String? {
+            var error: String? = null
+            if (!email.matches("^[A-Za-z](.*)([@])(.+)(\\.)(.+)".toRegex())) error = "Email is not valid!"
+            else if (pass.length < 6) error = "Password too short (must be 6+ chars)!"
+            else if (!pass.contains(".*\\d+.*".toRegex())) error = "Password must contain a digit!"
+            else if (pass != confirmPass) error = "Passwords don't match!"
+            else if (username.length < 3) error = "Username too short (must be 3+ chars)!"
+            return error
+        }
     }
 
 }

@@ -45,7 +45,7 @@ class GameActivity : BaseFullscreenActivity(), PermissionsListener {
                 .create())
         viewPager.adapter = adapter
         tabLayout.setViewPager(viewPager)
-        viewPager.setOnTouchListener { v, event -> (event?.action == MotionEvent.ACTION_MOVE) }
+        viewPager.setOnTouchListener { _, event -> (event?.action == MotionEvent.ACTION_MOVE) }
 
         // Also request map permissions RIGHT NOW
         checkRequestLocPermissions()
@@ -112,9 +112,7 @@ class GameActivity : BaseFullscreenActivity(), PermissionsListener {
             alert.setMessage("Welcome to COINZ, a game of spies. A nuclear warhead has gone missing and your mission is to retrieve it " +
                     (if (isE11) "in order to prevent it from falling into the wrong hands." else "and get rich in process.") +
                     "\nWould you like a brief tutorial?")
-            alert.setPositiveButton("PROCEED") { _, _ ->
-                ShowMapTabTutorial()
-            }
+            alert.setPositiveButton("PROCEED") { _, _ -> ShowMapTabTutorial() }
             alert.setNegativeButton("SKIP") { _, _ -> }
             alert.show()
 
@@ -185,7 +183,7 @@ class GameActivity : BaseFullscreenActivity(), PermissionsListener {
 
     private fun ShowStatsTabTutorial() {
         viewPager.currentItem = 3
-        val isE11 = DataManager.GetTeam() == Team.EleventhEchelon
+        //val isE11 = DataManager.GetTeam() == Team.EleventhEchelon
         val alert = AlertDialog.Builder(this)
         alert.setTitle("STATS SCREEN (4/5)")
         alert.setMessage("This is the Stats screen, which shows the daily currency rates, your current level, experience, and " +
@@ -202,7 +200,7 @@ class GameActivity : BaseFullscreenActivity(), PermissionsListener {
 
     private fun ShowMailTabTutorial() {
         viewPager.currentItem = 4
-        val isE11 = DataManager.GetTeam() == Team.EleventhEchelon
+        //val isE11 = DataManager.GetTeam() == Team.EleventhEchelon
         val alert = AlertDialog.Builder(this)
         alert.setTitle("OPERATIONS SCREEN (5/5)")
         alert.setMessage("This is the Mail screen, which lists your messages. Whenever someone sends you coins, the transaction will be recorded " +
