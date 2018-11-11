@@ -12,11 +12,11 @@ enum class MessageProvider(val textName: String, val batchSize: Int, val price: 
     // base price 60/p, but it's in GOLD
     MI5Data("MI5 Internal Datacentre", 500, 3000, Currency.GOLD, 1.0, 0.0,
             "E11 agents can access internal MI5 computing resources."),
-    // base 2/p, medium batch
+    // base 5/p, medium batch
     Europeans("EU INTCEN/ESISC", 250, 50, Currency.QUID, 1.0, 0.0,
             "Purchase some time from the European Union's Intelligence and Situation Centre and the " +
             "European Strategic Intelligence and Security Centre."),
-    // base 2/p, large batch
+    // base 5/p, large batch
     Americans("U.S./NATO resources", 600, 120, Currency.DOLR, 1.0, 0.0,
             "The U.S. Pentagon is more than happy to assist us with computing power. They made a pinky-promise " +
             "to not snoop around our traffic for their own purposes, and were aghast when we asked them if they REALLY " +
@@ -45,7 +45,7 @@ enum class MessageProvider(val textName: String, val batchSize: Int, val price: 
             "The University of Edinburgh's ARCHER (Advanced Research Computing High End Resource) is a " +
                 "prime source of compute, easily accessible by any interested party... In fact, it appears more " +
                 "difficult for a government agency to obtain access due to all the \"red tape\"."),
-    // base price 3/p, small batch, 1.0x both
+    // base price 3.333/p, small batch, 1.0x both
     BotNet("DeepNet BotNets", 200, 60, Currency.SHIL, 1.0, 1.0,
             "Purchase some computing time off of a distributed internet bot-network. Nobody knows where or " +
             "who exactly runs all of those machines, but the source should be safe and untraceable. Probably. Hopefully."),
