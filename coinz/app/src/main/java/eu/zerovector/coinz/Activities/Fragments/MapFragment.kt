@@ -36,7 +36,6 @@ import eu.zerovector.coinz.R
 import eu.zerovector.coinz.Utils
 import eu.zerovector.coinz.Utils.Companion.DrawRadiusPolygon
 import eu.zerovector.coinz.Utils.Companion.GenerateCoinIcon
-import eu.zerovector.coinz.Utils.Companion.MakeToast
 
 
 class MapFragment : Fragment(), OnMapReadyCallback, LocationEngineListener, PermissionsListener {
@@ -166,7 +165,7 @@ class MapFragment : Fragment(), OnMapReadyCallback, LocationEngineListener, Perm
     private fun enableLocationPlugin() {
         // Check if permissions are enabled and if not request
         if (PermissionsManager.areLocationPermissionsGranted(context)) {
-            MakeToast(context!!, "WE HAVE PERMISSIONS")
+            //MakeToast(context!!, "WE HAVE PERMISSIONS")
 
 
             initializeLocationEngine()

@@ -94,7 +94,7 @@ class MailFragment : Fragment() {
     // (You might wanna turn word wrap on for this one...)
     private val firstMessageE11 = Triple("Col. James Hendricks", "The nature of this operation.", """Analyst,
 
-        We've received word that a Soviet-era nuclear warhead, codenamed "Project Nocturnal Ziggurat", has recently become "lost" by the Kyrgyzstani government. We don't know who has it or where it is, but we're tracking lots of dark cryptotraffic surrounding it, located around the centre of beautiful Edinburgh. We need all boots on the ground at this point, and your participation may likely set you up for a rapid promotion in the Echelon.
+        We've received word that a Soviet-era nuclear warhead, codenamed "Project Nocturnal Ziggurat", has recently become "lost" by the Kyrgyzstani government during transport. We don't know who has it or where it is, but we're tracking lots of dark cryptotraffic surrounding it, located around the centre of beautiful Edinburgh. We need all boots on the ground at this point, and your participation may likely set you up for a rapid promotion in the Echelon.
 
         Our task is simple: we must decrypt as many of those secret messages as we can. However, we're short on money since the Brexit, and you'll have to buy your own processing power (a.k.a. "Compute"). Collect cryptocoins scattered around the hot zone, then use them to purchase Compute and decrypt the messages. We've given you some GOLD and allocated some computing power to get you started. Every message decrypted will bring us closer to locating that bomb and handling it safely without any danger to the public.
 

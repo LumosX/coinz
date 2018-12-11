@@ -19,7 +19,9 @@ import eu.zerovector.coinz.Data.DataManager
 import eu.zerovector.coinz.Data.Team
 import eu.zerovector.coinz.Data.bool
 import eu.zerovector.coinz.R
+import eu.zerovector.coinz.R.id.*
 import kotlinx.android.synthetic.main.activity_register.*
+import java.time.LocalDateTime
 
 
 class RegisterActivity : BaseFullscreenActivity(), View.OnTouchListener {
@@ -137,6 +139,8 @@ class RegisterActivity : BaseFullscreenActivity(), View.OnTouchListener {
                                             // I'd love to move this to the DataManager, but it'd be a pain in the arse, so it's here.
                                             // Add the new user data to the database, with modified name and team entries
                                             val user: AccountData = AccountData(username = username, team = team)
+                                            // Set the user's registration date
+                                            user.accountCreatedTimestamp = LocalDateTime.now().toString()
 
                                             val curUserDoc = firestore.collection("Users").document(fbAuth.currentUser!!.uid)
                                             curUserDoc.set(user).addOnCompleteListener { innerTask ->

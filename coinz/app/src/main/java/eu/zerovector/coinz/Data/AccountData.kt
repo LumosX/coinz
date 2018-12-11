@@ -7,6 +7,7 @@ data class AccountData (
         var team: Team = Team.EleventhEchelon,
         var username: String = "x",
 
+        var accountCreatedTimestamp: String = "", // Here so I can see when this project gets tested, hehe
         var lastLoginTimestamp: String = "",
 
         // Experience! It determines levels, i.e. collection range and wallet sizes
