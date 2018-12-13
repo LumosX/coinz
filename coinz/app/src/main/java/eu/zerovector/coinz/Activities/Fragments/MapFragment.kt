@@ -6,7 +6,6 @@ import android.location.Location
 import android.os.Bundle
 import android.support.v4.app.Fragment
 import android.support.v4.content.ContextCompat
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -132,16 +131,6 @@ class MapFragment : Fragment(), OnMapReadyCallback, LocationEngineListener, Perm
         mapboxMap.addLayer(layer)
 
 
-    }
-
-
-    private fun checkRequestLocPermissions() {
-        //Toast.makeText(this, "MAP READY TRIGGERED", Toast.LENGTH_SHORT).show()
-        // Check if permissions are enabled and if not request
-        if (!PermissionsManager.areLocationPermissionsGranted(context)) {
-            permissionsManager = PermissionsManager(this)
-            permissionsManager.requestLocationPermissions(activity)
-        }
     }
 
     override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<String>, grantResults: IntArray) {
@@ -287,13 +276,13 @@ class MapFragment : Fragment(), OnMapReadyCallback, LocationEngineListener, Perm
     @SuppressLint("MissingPermission")
     override fun onConnected() {
         locationEngine!!.requestLocationUpdates()
-        Log.d("AYYY", "onconnected triggered.")
+        //Log.d("AYYY", "onconnected triggered.")
     }
 
 
     // The main attraction: grabbing coins within range.
     override fun onLocationChanged(location: Location?) {
-        Log.d("AYYY", "onlocationchanged triggered: $location")
+        //Log.d("AYYY", "onlocationchanged triggered: $location")
         if (location == null) return
 
         val grabRadius = DataManager.GetGrabRadiusInMetres()
