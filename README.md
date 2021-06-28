@@ -1,12 +1,25 @@
 ## COINZ (CLANDESTINE OPERATION IMMINENT: NOCTURNAL ZIGGURAT)
 
-Rado M. Kirilchev (s1452923)
+Rado M. Kirilchev
 
 Repository for the Informatics Large Practical 2018/19 course.
 
 
+This is a multiplayer android game made from scratch. Unlike [Grabble](https://github.com/LumosX/grabble), which I developed in early 2017 (my penultimate undergrad year), this was made in late 2018 (during my Master's degree) and is significantly better in all possible aspects. Peek at the `ilp-report` pdf to see what it's all about. It's very pretty and has plenty of pictures.
+
+
+### Details
+Once again the professor was motivated by Pokemon Go, and thus wanted a game that integrates a map and geolocation. This time around we're walking around and collecting cryptocurrency "coins". Per the specifications, the project utilises Google Firebase and Mapbox for its storage and mapping needs respectively.
+
+Naturally, I created about two dozen extra features, adding bunches of extra mechanics into the game, as well as a narrative: a hidden war between two shadowy factions, vying for control over a Soviet-era nuclear warhead stolen from the Kyrgyzstani government. I am naturally quite happy with the results of this project.
+
+The name ("Coinz") was a part of the project specification; the "backronym" was my own invention.
+
+
+
+
 ### Game features:
-(**Note:** Features in *italics* denote specification-requested features. All others are to be considered bonus features.)
+(**Note:** Features in *italics* (i.e. only the first five bullet points) denote specification-requested features. All others are to be considered bonus features that I implemented of my own volition, that go beyond what was required for the course.)
 * *Coins of the four fictional cryptocurrencies may be collected by walking within range.*
 * *Collected coins are added to the respective "spare change" wallet balance.*
 * *Coins from the "spare change" wallets may be deposited to the player's bank account.*
@@ -32,3 +45,4 @@ Repository for the Informatics Large Practical 2018/19 course.
 ### Repo structure
 The **assets/*** folder contains the Photoshop source files for all drawables.  
 The **coinz/*** folder is the complete Android Studio project folder.
+

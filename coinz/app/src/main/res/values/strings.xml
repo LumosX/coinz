@@ -12,7 +12,7 @@
     <string name="hello_blank_fragment">Hello blank fragment</string>
 
     <!-- and this is to make using mapbox easier -->
-    <string name="mapbox_access_token">pk.eyJ1IjoicmFkbXJrdiIsImEiOiJjam1rcDB4cGowcWd3M3Ztc3A3OWVjdW1hIn0.D8ooLER6oVUw1elsGO8hyw</string>
+    <string name="mapbox_access_token">CENSORED</string>
 
 
     <!-- And this, for good measure.-->
