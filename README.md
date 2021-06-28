@@ -9,9 +9,9 @@ This is a multiplayer android game made from scratch. Unlike [Grabble](https://g
 
 
 ### Details
-Once again the professor was motivated by Pokemon Go, and thus wanted a game that integrates a map and geolocation. This time around we're walking around and collecting cryptocurrency "coins". Per the specifications, the project utilises Google Firebase and Mapbox for its storage and mapping needs respectively.
+Once again the professor was motivated by Pokemon Go, and thus wanted a game that integrates a map and geolocation. This time around we're walking around and collecting fictional "cryptocurrency coins". Per the specifications, the project utilises Google Firebase and Mapbox for its storage and mapping needs respectively.
 
-Naturally, I created about two dozen extra features, adding bunches of extra mechanics into the game, as well as a narrative: a hidden war between two shadowy factions, vying for control over a Soviet-era nuclear warhead stolen from the Kyrgyzstani government. I am naturally quite happy with the results of this project.
+Naturally, I created about two dozen extra features, adding bunches of extra mechanics into the game, as well as a narrative: a hidden war between two shadowy factions—an elite branch of the MI5 and a terrorist organisation—vying for control over a Soviet-era nuclear warhead stolen from the Kyrgyzstani government. I am naturally quite happy with the results of this project.
 
 The name ("Coinz") was a part of the project specification; the "backronym" was my own invention.
 
