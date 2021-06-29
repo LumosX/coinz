@@ -16,6 +16,30 @@ Naturally, I created about two dozen extra features, adding bunches of extra mec
 The name ("Coinz") was a part of the project specification; the "backronym" was my own invention.
 
 
+### Screenshots
+
+<table width="100%" cellspacing="1" cellpadding="1" style="border-collapse: collapse; border: none">
+<tr>
+<td><a href="https://user-images.githubusercontent.com/17273782/123876164-ca445480-d932-11eb-9f4d-e449d072d968.png" target="_blank"><img src="https://user-images.githubusercontent.com/17273782/123876164-ca445480-d932-11eb-9f4d-e449d072d968.png" width="100%"/></a></td>
+
+<td><a href="https://user-images.githubusercontent.com/17273782/123876171-cc0e1800-d932-11eb-9fb4-36bf46a012a6.png" target="_blank"><img src="https://user-images.githubusercontent.com/17273782/123876171-cc0e1800-d932-11eb-9fb4-36bf46a012a6.png" width="100%"/></a></td>
+
+<td><a href="https://user-images.githubusercontent.com/17273782/123876132-c1538300-d932-11eb-96fe-5dcadfd50003.png" target="_blank"><img src="https://user-images.githubusercontent.com/17273782/123876132-c1538300-d932-11eb-96fe-5dcadfd50003.png" width="100%"/></a></td>
+
+<td><a href="https://user-images.githubusercontent.com/17273782/123876142-c3b5dd00-d932-11eb-89b7-541d4c350e81.png" target="_blank"><img src="https://user-images.githubusercontent.com/17273782/123876142-c3b5dd00-d932-11eb-89b7-541d4c350e81.png" width="100%"/></a></td>
+</tr>
+<tr>
+<td><a href="https://user-images.githubusercontent.com/17273782/123876147-c4e70a00-d932-11eb-8cc7-bb0fcbd1d0f9.png" target="_blank"><img src="https://user-images.githubusercontent.com/17273782/123876147-c4e70a00-d932-11eb-8cc7-bb0fcbd1d0f9.png" width="100%"/></a></td>
+
+<td><a href="https://user-images.githubusercontent.com/17273782/123876150-c6183700-d932-11eb-8141-ee953e7773e7.png" target="_blank"><img src="https://user-images.githubusercontent.com/17273782/123876150-c6183700-d932-11eb-8141-ee953e7773e7.png" width="100%"/></a></td>
+
+<td><a href="https://user-images.githubusercontent.com/17273782/123876154-c7e1fa80-d932-11eb-8f0f-86f5348025fd.png" target="_blank"><img src="https://user-images.githubusercontent.com/17273782/123876154-c7e1fa80-d932-11eb-8f0f-86f5348025fd.png" width="100%"/></a></td>
+
+<td><a href="https://user-images.githubusercontent.com/17273782/123876158-c9132780-d932-11eb-9ca0-711ad3e66d2b.png" target="_blank"><img src="https://user-images.githubusercontent.com/17273782/123876158-c9132780-d932-11eb-9ca0-711ad3e66d2b.png" width="100%"/></a></td>
+</tr>
+</table>
+
+
 
 
 ### Game features:
